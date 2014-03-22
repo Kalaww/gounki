@@ -67,7 +67,7 @@ piece *getPieceByCoordListe(liste *l, char x, char y){
 	return NULL;
 }
 
-int mouvementAutoriser(liste *l, char couleur, char x, char y, char a, char b){
+int deplacementAutoriser(liste *l, char couleur, char x, char y, char a, char b){
 	piece *depart, *arrivee;
 	int sens = (couleur == 'b')? 1 : -1;
 	depart = getPieceByCoordListe(l, x, y);
@@ -123,6 +123,24 @@ int mouvementAutoriser(liste *l, char couleur, char x, char y, char a, char b){
 		return deplacementPiece(l, depart, arrivee, a, b);
 	}
 	return 0;
+}
+
+int deploiementAutoriser(liste *l, char couleur, char commencePar, char x, char y, char a, char b, char a1, char b1){
+	piece *depart, *arrivee;
+	int sens = (couleur == 'b')? 1 : -1;
+	depart = getPieceByCoordListe(l, x, y);
+	arrivee = getPieceByCoordListe(l, a, b);
+	if(depart == NULL || (arrivee != NULL && arrivee->couleur != depart->couleur)){
+		printf("Aucune pièce sur la case de départ\n");
+		return 0;
+	}
+	
+	if(depart->t == carre || depart->t == rond) return 0;
+	else if(depart->t == ccarre){
+		if(commencePar == '*') return 0;
+		
+	}
+	return 1;
 }
 
 int deplacementPiece(liste *l, piece *depart, piece *arrivee, char a, char b){
