@@ -18,7 +18,7 @@ void freeJeu(jeu *j){
 }
 
 void startJeu(jeu *j){
-	char sortie = 0, x, y, erreur = 1, *vide;
+	char sortie = 0, x, y, a, b, erreur = 1, *vide;
 	char input[10];
 	while(sortie != 1){
 		printPlateau(j);
@@ -30,21 +30,34 @@ void startJeu(jeu *j){
 			if(strlen(input) == 1 && input[0] == 'q'){
 				erreur = 0;
 				sortie = 1;
-			}else if(strlen(input) == 2 && 
-						input[0] >= 'a' && 
-						input[0] <= 'h' && 
-						input[1] >= '1' &&  
-						input[1] <= '8'){
+			}else if(estMouvement(input)){
 				x = input[0];
 				y = input[1];
+				a = input[3];
+				b = input[4];
 				erreur = 0;
-				printf("Déplacement de (%c,%c)\n", x, y);
+				printf("Déplacement de (%c,%c) en (%c,%c) : ", x, y, a, b);
+				if(!mouvementAutoriser(j->list, j->joueur, x, y, a, b))
+					printf("[impossible]");
+				else 
+					printf("[succès]");
+				printf("\n");
 			}else{
 				printf("Mauvaises coordonnées !\n");
 			}
 		}while(erreur);
+		j->joueur = (j->joueur == 'b')? 'n' : 'b';
 	}
 	printf("Fermeture du jeu\n");
+}
+
+int estMouvement(char input[]){
+	return strlen(input) == 5 
+		&& input[0] >= 'a' && input[0] <= 'h'
+		&& input[1] >= '1' && input[1] <= '8'
+		&& input[2] == '-'
+		&& input[3] >= 'a' && input[3] <= 'h'
+		&& input[4] >= '1' && input[4] <= '8';
 }
 
 void initPlateau(liste *l){

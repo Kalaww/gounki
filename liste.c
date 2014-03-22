@@ -67,12 +67,78 @@ piece *getPieceByCoordListe(liste *l, char x, char y){
 	return NULL;
 }
 
-int deplacementAutoriser(liste *l, char couleur, char x, char y, char a, char b){
+int mouvementAutoriser(liste *l, char couleur, char x, char y, char a, char b){
 	piece *depart, *arrivee;
+	int sens = (couleur == 'b')? 1 : -1;
 	depart = getPieceByCoordListe(l, x, y);
 	arrivee = getPieceByCoordListe(l, a, b);
-	if(depart == NULL || (arrivee != NULL && arrivee->couleur != couleur)) return 0;
-	return deplacementPiece(depart, a, b);
+	if(depart == NULL){
+		printf("Aucune pièce sur la case de départ\n");
+		return 0;
+	}
+	
+	if(depart->t == carre && 
+			((a == depart->x-1 && b == depart->y) || 
+			(a == depart->x+1 && b == depart->y) ||
+			(a == depart->x && b == depart->y+sens))){
+		return deplacementPiece(l, depart, arrivee, a, b);
+	}else if(depart->t == rond && b == depart->y+sens &&
+			(a == depart->x-1 || a == depart->x+1)){
+		return deplacementPiece(l, depart, arrivee, a, b);
+	}else if(depart->t == ccarre &&
+			((a == depart->x-2 && b == depart->y && getPieceByCoordListe(l, x-1, y) == NULL) || 
+			(a == depart->x+2 && b == depart->y && getPieceByCoordListe(l, x+1, y) == NULL) ||
+			(a == depart->x && b == depart->y+2*sens && getPieceByCoordListe(l, x, y+sens) == NULL))){
+		return deplacementPiece(l, depart, arrivee, a, b);
+	}else if(depart->t == rrond && b == depart->y+2*sens &&
+			((a == depart->x-2 && getPieceByCoordListe(l, x-1, y+sens) == NULL) || 
+			(a == depart->x+2 && getPieceByCoordListe(l, x+1, y+sens) == NULL))){
+		return deplacementPiece(l, depart, arrivee, a, b);
+	}else if(depart->t == cccarre && 
+			((a == depart->x-3 && b == depart->y && getPieceByCoordListe(l, x-1, y) == NULL && getPieceByCoordListe(l, x-2, y) == NULL) || 
+			(a == depart->x+3 && b == depart->y && getPieceByCoordListe(l, x+1, y) == NULL && getPieceByCoordListe(l, x+2, y) == NULL) ||
+			(a == depart->x && b == depart->y+3*sens && getPieceByCoordListe(l, x, y+sens) == NULL && getPieceByCoordListe(l, x, y+2*sens) == NULL))){
+		return deplacementPiece(l, depart, arrivee, a, b);
+	}else if(depart->t == rrrond && b == depart->y+3*sens &&
+			((a == depart->x-3 && getPieceByCoordListe(l, x-1, y+sens) == NULL && getPieceByCoordListe(l, x-2, y+2*sens) == NULL) || 
+			(a == depart->x+3 && getPieceByCoordListe(l, x+1, y+sens) == NULL && getPieceByCoordListe(l, x+2, y+2*sens) == NULL))){
+		return deplacementPiece(l, depart, arrivee, a, b);
+	}else if(depart->t == crond && 
+			((a == depart->x-1 && b == depart->y) || 
+			(a == depart->x+1 && b == depart->y) ||
+			(a == depart->x && b == depart->y+sens) ||
+			(b == depart->y+sens && (a == depart->x-1 || a == depart->x+1)))){
+		return deplacementPiece(l, depart, arrivee, a, b);
+	}else if(depart->t == ccrond &&
+			((a == depart->x-2 && b == depart->y && getPieceByCoordListe(l, x-1, y) == NULL) || 
+			(a == depart->x+2 && b == depart->y && getPieceByCoordListe(l, x+1, y) == NULL) ||
+			(a == depart->x && b == depart->y+2*sens && getPieceByCoordListe(l, x, y+sens) == NULL) ||
+			(b == depart->y+sens && (a == depart->x-1 || a == depart->x+1)))){
+		return deplacementPiece(l, depart, arrivee, a, b);
+	}else if(depart->t == crrond &&
+			((a == depart->x-1 && b == depart->y) || 
+			(a == depart->x+1 && b == depart->y) ||
+			(a == depart->x && b == depart->y+sens) ||
+			(b == depart->y+2*sens && ((a == depart->x-2 && getPieceByCoordListe(l, x-1, y+sens) == NULL) || (a == depart->x+2 && getPieceByCoordListe(l, x+1, y+sens) == NULL))))){
+		return deplacementPiece(l, depart, arrivee, a, b);
+	}
+	return 0;
+}
+
+int deplacementPiece(liste *l, piece *depart, piece *arrivee, char a, char b){
+	if(arrivee != NULL){
+		if(arrivee->couleur != depart->couleur){
+			removeListe(l, arrivee);
+		}else{
+			if(empilementPiece(depart, arrivee))
+				removeListe(l, arrivee);
+			else
+				return 0;
+		}
+	}
+	depart->x = a;
+	depart->y = b;
+	return 1;
 }
 
 void printListe(liste *l){

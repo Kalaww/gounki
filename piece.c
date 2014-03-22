@@ -28,6 +28,33 @@ char* strPiece(piece *p){
 	return mot;
 }
 
-int deplacementPiece(piece *p, char a, char b){
+int empilementPiece(piece *depart, piece *arrivee){
+	if(depart->t == cccarre || depart->t == rrrond || arrivee->t == cccarre || depart->t == rrrond
+		|| ((depart->t == ccarre|| depart->t == rrond || depart->t == crond) && (arrivee->t == rrond || arrivee->t == ccarre || arrivee->t == crond))){
+		return 0;
+	}
+	
+	if(depart->t == carre){
+		if(arrivee->t == rond) depart->t = crond;
+		else if(arrivee->t == carre) depart->t = ccarre;
+		else if(arrivee->t == ccarre) depart->t = cccarre;
+		else if(arrivee->t == rrond) depart->t = crrond;
+		else if(arrivee->t == crond) depart->t = ccrond;
+	}else if(depart->t == rond){
+		if(arrivee->t == rond) depart->t = rrond;
+		else if(arrivee->t == carre) depart->t = crond;
+		else if(arrivee->t == ccarre) depart->t = ccrond;
+		else if(arrivee->t == rrond) depart->t = rrrond;
+		else if(arrivee->t == crond) depart->t = crrond;
+	}else if(depart->t == ccarre){
+		if(arrivee->t == carre) depart->t = cccarre;
+		else if(arrivee->t == rond) depart->t = ccrond;
+	}else if(depart->t == rrond){
+		if(arrivee->t == carre) depart->t = crrond;
+		else if(arrivee->t == rond) depart->t = rrrond;
+	}else if(depart->t == crond){
+		if(arrivee->t == carre) depart->t = ccrond;
+		else if(arrivee->t == rond) depart->t = crrond;
+	}
 	return 1;
 }

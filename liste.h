@@ -1,7 +1,6 @@
-#include "piece.h"
-
 #ifndef H_LISTE
 #define H_LISTE
+#include "piece.h"
 
 typedef struct noeud{
 	piece *p;
@@ -21,6 +20,7 @@ void addListe(liste*, piece*);
 void removeListe(liste*, piece*);
 void printListe(liste*);
 piece *getPieceByCoordListe(liste*, char, char);
-int deplacementAutoriser(liste*, char, char, char, char, char);
+int deplacementPiece(liste*, piece*, piece*, char, char);
+int mouvementAutoriser(liste*, char, char, char, char, char);
 
 #endif
