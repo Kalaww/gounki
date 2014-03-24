@@ -29,7 +29,7 @@ char* strPiece(piece *p){
 }
 
 int empilementPiece(piece *depart, piece *arrivee){
-	if(depart->t == cccarre || depart->t == rrrond || arrivee->t == cccarre || depart->t == rrrond
+	if(depart->t == cccarre || depart->t == rrrond || arrivee->t == cccarre || arrivee->t == rrrond
 		|| ((depart->t == ccarre|| depart->t == rrond || depart->t == crond) && (arrivee->t == rrond || arrivee->t == ccarre || arrivee->t == crond))){
 		return 0;
 	}
@@ -55,6 +55,72 @@ int empilementPiece(piece *depart, piece *arrivee){
 	}else if(depart->t == crond){
 		if(arrivee->t == carre) depart->t = ccrond;
 		else if(arrivee->t == rond) depart->t = crrond;
+	}
+	return 1;
+}
+
+int empilementUnique(piece *arrivee, type valeur){
+	if(arrivee->t == cccarre || arrivee->t == rrrond || arrivee->t == ccrond || arrivee->t == crrond) return 0;
+	if(valeur == rrrond || valeur == cccarre || valeur == ccrond || valeur == crrond || 
+		((valeur == ccarre || valeur == rrond || valeur == crond) && (arrivee->t == ccarre || arrivee->t == rrond || arrivee->t == crond))) return 0;
+	
+	if(arrivee->t == carre){
+		switch(valeur){
+			case carre:
+				arrivee->t = ccarre; break;
+			case rond:
+				arrivee->t = crond; break;
+			case ccarre:
+				arrivee->t = cccarre; break;
+			case rrond :
+				arrivee->t = crrond; break;
+			case crond:
+				arrivee->t = ccrond; break;
+			default:
+				break;
+		}
+	}else if(arrivee->t == rond){
+		switch(valeur){
+			case carre:
+				arrivee->t = crond; break;
+			case rond:
+				arrivee->t = rrond; break;
+			case ccarre:
+				arrivee->t = ccrond; break;
+			case rrond :
+				arrivee->t = rrrond; break;
+			case crond:
+				arrivee->t = crrond; break;
+			default:
+				break;
+		}
+	}else if(arrivee->t == ccarre){
+		switch(valeur){
+			case carre:
+				arrivee->t = cccarre; break;
+			case rond:
+				arrivee->t = ccrond; break;
+			default:
+				break;
+		}
+	}else if(arrivee->t == rrond){
+		switch(valeur){
+			case carre:
+				arrivee->t = crrond; break;
+			case rond:
+				arrivee->t = rrrond; break;
+			default:
+				break;
+		}
+	}else if(arrivee->t == crond){
+		switch(valeur){
+			case carre:
+				arrivee->t = ccrond; break;
+			case rond:
+				arrivee->t = crrond; break;
+			default:
+				break;
+		}
 	}
 	return 1;
 }

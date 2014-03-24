@@ -36,7 +36,7 @@ void startJeu(jeu *j){
 				a = input[3];
 				b = input[4];
 				printf("Déplacement de (%c,%c) en (%c,%c) : ", x, y, a, b);
-				if(deplacementAutoriser(j->list, j->joueur, x, y, a, b)){
+				if(deplacementAutoriser(j->list, j->joueur, x, y, a, b) && deplacementPiece(j->list, x, y, a, b)){
 					printf("[succès]");
 					erreur = 0;
 				}else{
@@ -46,15 +46,18 @@ void startJeu(jeu *j){
 			}else if(estDeploiement(input)){
 				x = input[0];
 				y = input[1];
-				a = input[3];
-				b = input[4];
-				a1 = input[6];
-				b1 = input[7];
-				commencePar = (input[2] == '+')? 'c' : 'r';
-				printf("Déplacement de (%c,%c) en (%c,%c) commençant par les %s en (%c,%c) : ", x, y, a, b, (commencePar == '+')? "carré" : "rond", a1, b1);
-				if(0){
-					printf("[succès]");
-					erreur = 0;
+				a1 = input[3];
+				b1 = input[4];
+				a = input[6];
+				b = input[7];
+				commencePar = input[2];
+				printf("Déploiement de (%c,%c) en (%c,%c) commençant par les %s en (%c,%c) : ", x, y, a, b, (commencePar == '+')? "carré" : "rond", a1, b1);
+				if(deploiementAutoriser(j->list, j->joueur, commencePar, x, y, a, b, a1, b1)){
+					printf("{{Deploiement autorisée}}\n");
+					if(deploiementPiece(j->list, commencePar, x, y, a, b, a1, b1)){
+						printf("[succès]");
+						erreur = 0;
+					}
 				}else{
 					printf("[impossible]");
 				}

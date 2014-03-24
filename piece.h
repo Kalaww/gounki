@@ -17,5 +17,6 @@ void freePiece(piece*);
 int equalsPiece(piece*, piece*);
 char* strPiece(piece*);
 int empilementPiece(piece*, piece*);
+int empilementUnique(piece*, type);
 
 #endif
