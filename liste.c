@@ -68,15 +68,35 @@ piece *getPieceByCoordListe(liste *l, char x, char y){
 }
 
 int deplacementAutoriser(liste *l, char couleur, char x, char y, char a, char b){
-	piece *depart;
+	piece *depart, *tmp;
 	int sens = (couleur == 'b')? 1 : -1;
+	int i, j, sens1, sens2;
 	depart = getPieceByCoordListe(l, x, y);
 	if(depart == NULL){
 		printf("Aucune pièce sur la case de départ\n");
 		return 0;
 	}
 	
-	if(depart->t == carre){
+	if(b == '0' || b == '9'){
+		if(x == a){
+			sens1 = (y <= b)? 1 : -1;
+			for(i = y+sens1; i < b; i+=sens1){
+				tmp = getPieceByCoordListe(l, x, i);
+				if(tmp != NULL) return 0;
+			}
+		}else{
+			sens1 = (x <= a)? 1 : -1;
+			sens2 = (y <= b)? 1 : -1;
+			j = y+sens2;
+			for(i = x+sens1; i < a; i+=sens1){
+				j+=sens2;
+				tmp = getPieceByCoordListe(l, i, j);
+				if(tmp != NULL) return 0;
+			}
+		}
+		if(x == a) return depart->t == carre || depart->t == ccarre || depart->t == cccarre || depart->t == crond || depart->t == ccrond || depart->t == crrond;
+		else return 1;
+	}else if(depart->t == carre){
 		return ((a == depart->x-1 && b == depart->y) || 
 				(a == depart->x+1 && b == depart->y) ||
 				(a == depart->x && b == depart->y+sens));
@@ -222,6 +242,8 @@ int deplacementPiece(liste *l, char x, char y, char a, char b){
 	}
 	depart->x = a;
 	depart->y = b;
+	if(b == '0') return 3;
+	if(b == '9') return 2;
 	return 1;
 }
 
@@ -395,6 +417,8 @@ int deploiementPiece(liste *l, char commencePar, char x, char y, char a, char b,
 		}
 	}
 	removeListe(l, depart);
+	if(b > '8') return 2;
+	if(b < '1') return 3;
 	return 1;
 }
 

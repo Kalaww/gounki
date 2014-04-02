@@ -12,8 +12,9 @@ typedef struct jeu{
 jeu *initJeu();
 void freeJeu(jeu*);
 void startJeu(jeu*);
-int estMouvement(char[]);
-int estDeploiement(char[]);
+int estMouvement(char[], char);
+int estDeploiement(char[], char);
+int estPieceDuJoueur(liste*, char, char, char);
 void initPlateau(liste*);
 void printPlateau(jeu *j);
 
