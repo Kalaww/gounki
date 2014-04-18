@@ -30,63 +30,171 @@ liste* deplacementCasesValides(liste *l, type t, char couleur, char x, char y){
 	int sens = (couleur == 'b')? 1 : -1;
 	
 	if(t == carre || t == crond || t == crrond){
-		if(deplacementPossible(l, couleur, x, y, x-1, y)) addListe(cases, initPiece(x-1, y, couleur, t));
-		if(deplacementPossible(l, couleur, x, y, x+1, y)) addListe(cases, initPiece(x+1, y, couleur, t));
-		if(deplacementPossible(l, couleur, x, y, x, y+sens)) addListe(cases, initPiece(x, y+sens, couleur, t));
+		if(deplacementPossible(l, couleur, x-1, y)) addListe(cases, initPiece(x-1, y, couleur, t));
+		if(deplacementPossible(l, couleur, x+1, y)) addListe(cases, initPiece(x+1, y, couleur, t));
+		if(deplacementPossible(l, couleur, x, y+sens)) addListe(cases, initPiece(x, y+sens, couleur, t));
 	}
 	
 	if(t == rond || t == crond || t == ccrond){
-		if(deplacementPossible(l, couleur, x, y, x-1, y+sens)) addListe(cases, initPiece(x-1, y+sens, couleur, t));
-		if(deplacementPossible(l, couleur, x, y, x+1, y+sens)) addListe(cases, initPiece(x+1, y+sens, couleur, t));
+		if(deplacementPossible(l, couleur, x-1, y+sens)) addListe(cases, initPiece(x-1, y+sens, couleur, t));
+		if(deplacementPossible(l, couleur, x+1, y+sens)) addListe(cases, initPiece(x+1, y+sens, couleur, t));
 	}
 	
 	if(t == ccarre || t == ccrond){
-		if(getPieceByCoordListe(l, x-1, y) == NULL && deplacementPossible(l, couleur, x, y, x-2, y)) addListe(cases, initPiece(x-2, y, couleur, t));
-		if(getPieceByCoordListe(l, x+1, y) == NULL && deplacementPossible(l, couleur, x, y, x+2, y)) addListe(cases, initPiece(x+2, y, couleur, t));
-		if(getPieceByCoordListe(l, x, y+sens) == NULL && deplacementPossible(l, couleur, x, y, x, y+2+sens)) addListe(cases, initPiece(x, y+2*sens, couleur, t));
+		/*rebond*/
+		if(x == 'b'){
+			if(getPieceByCoordListe(l, x-1, y) == NULL) addListe(cases, initPiece(x, y, couleur, t));
+		/*normal*/
+		}else if(x > 'b'){
+			if(getPieceByCoordListe(l, x-1, y) == NULL && deplacementPossible(l, couleur, x-2, y)) addListe(cases, initPiece(x-2, y, couleur, t));
+		}
+		
+		/*rebond*/
+		if(x == 'g'){
+			if(getPieceByCoordListe(l, x+1, y) == NULL) addListe(cases, initPiece(x, y, couleur, t));
+		/*normal*/
+		}else if(x < 'g'){
+			if(getPieceByCoordListe(l, x+1, y) == NULL && deplacementPossible(l, couleur, x+2, y)) addListe(cases, initPiece(x+2, y, couleur, t));
+		}
+		
+		/*victoire*/
+		if((couleur == 'b' && y == '8') || (couleur == 'n' && y == '1')){
+			addListe(cases, initPiece(x, y+sens, couleur, t));
+		/*normal*/
+		}else if((couleur == 'b' && y < '7') || (couleur == 'n' && y > 2)){
+			if(getPieceByCoordListe(l, x, y+sens) == NULL && deplacementPossible(l, couleur, x, y+2+sens)) addListe(cases, initPiece(x, y+2*sens, couleur, t));
+		}
 	}
 	
 	if(t == rrond || t == crrond){
-		if(getPieceByCoordListe(l, x-1, y+sens) == NULL && deplacementPossible(l, couleur, x, y, x-2, y+2*sens)) addListe(cases, initPiece(x-2, y+2*sens, couleur, t));
-		if(getPieceByCoordListe(l, x+1, y+sens) == NULL && deplacementPossible(l, couleur, x, y, x+2, y+2*sens)) addListe(cases, initPiece(x+2, y+2*sens, couleur, t));
+		/*victoire*/
+		if(((couleur == 'b' && y == '8') || (couleur == 'n' && y == '1')) && x >= 'b'){
+			addListe(cases, initPiece(x-1, y+sens, couleur, t));
+		/*rebond*/
+		}else if(x == 'b'){
+			if(getPieceByCoordListe(l, x-1, y+sens) == NULL && deplacementPossible(l, couleur, x, y+2*sens)) addListe(cases, initPiece(x, y+2*sens, couleur, t));
+		/*normal*/
+		}else if(x > 'b'){
+			if(getPieceByCoordListe(l, x-1, y+sens) == NULL && deplacementPossible(l, couleur, x-2, y+2*sens)) addListe(cases, initPiece(x-2, y+2*sens, couleur, t));
+		}
+		
+		/*victoire*/
+		if(((couleur == 'b' && y == '8') || (couleur == 'n' && y == '1')) && x <= 'g'){
+			addListe(cases, initPiece(x+1, y+sens, couleur, t));
+		/*rebond*/
+		}else if(x == 'g'){
+			if(getPieceByCoordListe(l, x+1, y+sens) == NULL && deplacementPossible(l, couleur, x, y+2*sens)) addListe(cases, initPiece(x, y+2*sens, couleur, t));
+		/*normal*/
+		}else if(x < 'g'){
+			if(getPieceByCoordListe(l, x+1, y+sens) == NULL && deplacementPossible(l, couleur, x+2, y+2*sens)) addListe(cases, initPiece(x+2, y+2*sens, couleur, t));
+		}
 	}
 	
 	if(t == cccarre){
-		if(getPieceByCoordListe(l, x-1, y) == NULL && getPieceByCoordListe(l, x-2, y) == NULL && deplacementPossible(l, couleur, x, y, x-3, y)) addListe(cases, initPiece(x-3, y, couleur, t));
-		if(getPieceByCoordListe(l, x+1, y) == NULL && getPieceByCoordListe(l, x+2, y) == NULL && deplacementPossible(l, couleur, x, y, x+3, y)) addListe(cases, initPiece(x+3, y, couleur, t));
-		if(getPieceByCoordListe(l, x, y+sens) == NULL && getPieceByCoordListe(l, x, y+2*sens) == NULL && deplacementPossible(l, couleur, x, y, x, y+3+sens)) addListe(cases, initPiece(x, y+3*sens, couleur, t));
+		/*rebond*/
+		if(x == 'c'){
+			if(getPieceByCoordListe(l, x-1, y) == NULL && getPieceByCoordListe(l, x-2, y) == NULL) addListe(cases, initPiece(x-1, y, couleur, t));
+		/*rebond*/
+		}else if(x == 'b'){
+			if(getPieceByCoordListe(l, x-1, y) == NULL && deplacementPossible(l, couleur, x+1, y)) addListe(cases, initPiece(x+1, y, couleur,t));
+		/*normal*/
+		}else if(x > 'c'){
+			if(getPieceByCoordListe(l, x-1, y) == NULL && getPieceByCoordListe(l, x-2, y) == NULL && deplacementPossible(l, couleur, x-3, y)) addListe(cases, initPiece(x-3, y, couleur, t));
+		}
+		
+		/*rebond*/
+		if(x == 'f'){
+			if(getPieceByCoordListe(l, x+1, y) == NULL && getPieceByCoordListe(l, x+2, y) == NULL) addListe(cases, initPiece(x+1, y, couleur, t));
+		/*rebond*/
+		}else if(x == 'g'){
+			if(getPieceByCoordListe(l, x+1, y) == NULL && deplacementPossible(l, couleur, x-1, y)) addListe(cases, initPiece(x-1, y, couleur, t));
+		/*normal*/
+		}else if(x < 'g'){
+			if(getPieceByCoordListe(l, x+1, y) == NULL && getPieceByCoordListe(l, x+2, y) == NULL && deplacementPossible(l, couleur, x+3, y)) addListe(cases, initPiece(x+3, y, couleur, t));
+		}
+		
+		/*victoire*/
+		if((couleur == 'b' && y == '8') || (couleur == 'n' && y == '1')){
+			addListe(cases, initPiece(x, y+sens, couleur, t));
+		/*victoire*/
+		}else if((couleur == 'b' && y == '7') || (couleur == 'n' && y == '2')){
+			if(getPieceByCoordListe(l, x, y+sens) == NULL) addListe(cases, initPiece(x, y+2*sens, couleur, t));
+		/*normal*/
+		}else if((couleur == 'b' && y < '7') || (couleur == 'n' && y > '2')){
+			if(getPieceByCoordListe(l, x, y+sens) == NULL && getPieceByCoordListe(l, x, y+2*sens) == NULL && deplacementPossible(l, couleur, x, y+3+sens)) addListe(cases, initPiece(x, y+3*sens, couleur, t));
+		}
 	}
 	
 	if(t == rrrond){
-		if(getPieceByCoordListe(l, x-1, y+sens) == NULL && getPieceByCoordListe(l, x-2, y+sens) == NULL && deplacementPossible(l, couleur, x, y, x-3, y+3*sens)) addListe(cases, initPiece(x-3, y+3*sens, couleur, t));
-		if(getPieceByCoordListe(l, x+1, y+sens) == NULL && getPieceByCoordListe(l, x+2, y+sens) == NULL && deplacementPossible(l, couleur, x, y, x+3, y+3*sens)) addListe(cases, initPiece(x+3, y+3*sens, couleur, t));
+		/*victoire*/
+		if(((couleur == 'b' && y == '8') || (couleur == 'n' && y == '1')) && x > 'a'){
+			addListe(cases, initPiece(x-1, y+sens, couleur, t));
+		/*victoire + rebond*/
+		}else if(((couleur == 'b' && y == '7') || (couleur == 'n' && y == '2')) && x == 'b'){
+			if(getPieceByCoordListe(l, x-1, y+sens) == NULL) addListe(cases, initPiece(x, y+2*sens, couleur, t));
+		/*victoire*/
+		}else if(((couleur == 'b' && y == '7') || (couleur == 'n' && y == '2')) && x > 'b'){
+			if(getPieceByCoordListe(l, x-1, y+sens) == NULL) addListe(cases, initPiece(x-2, y+2*sens, couleur, t));
+		/*rebond*/
+		}else if(x == 'c'){
+			if(getPieceByCoordListe(l, x-1, y+sens) == NULL && getPieceByCoordListe(l, x-2, y+sens) == NULL && deplacementPossible(l, couleur, x-1, y+3*sens)) addListe(cases, initPiece(x-1, y+3*sens, couleur, t));
+		/*rebond*/
+		}else if(x == 'b'){
+			if(getPieceByCoordListe(l, x-1, y+sens) == NULL && getPieceByCoordListe(l, x, y+2*sens) == NULL && deplacementPossible(l, couleur, x+1, y+3*sens)) addListe(cases, initPiece(x+1, y+3*sens, couleur, t));
+		/*normal*/
+		}else if(x > 'c'){
+			if(getPieceByCoordListe(l, x-1, y+sens) == NULL && getPieceByCoordListe(l, x-2, y+2*sens) == NULL && deplacementPossible(l, couleur, x-3, y+3*sens)) addListe(cases, initPiece(x-3, y+3*sens, couleur, t));
+		}
+		
+		/*victoire*/
+		if(((couleur == 'b' && y == '8') || (couleur == 'n' && y == '1')) && x < 'h'){
+			addListe(cases, initPiece(x+1, y+sens, couleur, t));
+		/*victoire + rebond*/
+		}else if(((couleur == 'b' && y == '7') || (couleur == 'n' && y == '2')) && x == 'g'){
+			if(getPieceByCoordListe(l, x+1, y+sens) == NULL) addListe(cases, initPiece(x, y+2*sens, couleur, t));
+		/*victoire*/
+		}else if(((couleur == 'b' && y == '7') || (couleur == 'n' && y == '2')) && x < 'g'){
+			if(getPieceByCoordListe(l, x+1, y+sens) == NULL) addListe(cases, initPiece(x+2, y+2*sens, couleur, t));
+		/*rebond*/
+		}else if(x == 'f'){
+			if(getPieceByCoordListe(l, x+1, y+sens) == NULL && getPieceByCoordListe(l, x+2, y+2*sens) == NULL && deplacementPossible(l, couleur, x+1, y+3*sens)) addListe(cases, initPiece(x+1, y+3*sens, couleur, t));
+		/*rebond*/
+		}else if(x == 'g'){
+			if(getPieceByCoordListe(l, x+1, y+sens) == NULL && getPieceByCoordListe(l, x, y+2*sens) == NULL && deplacementPossible(l, couleur, x-1, y+3*sens)) addListe(cases, initPiece(x-1, y+3*sens, couleur, t));
+		/*normal*/
+		}else if(x < 'f'){
+			if(getPieceByCoordListe(l, x+1, y+sens) == NULL && getPieceByCoordListe(l, x+2, y+2*sens) == NULL && deplacementPossible(l, couleur, x+3, y+3*sens)) addListe(cases, initPiece(x+3, y+3*sens, couleur, t));
+		}
 	}
 	
 	return cases;
 }
 
-int deplacementPossible(liste *l, char couleur, char x, char y, char a, char b){
-	piece *tmp = getPieceByCoordListe(l, a, b);
+int deplacementPossible(liste *l, char couleur, char x, char y){
+	piece *tmp = getPieceByCoordListe(l, x, y);
 	return tmp == NULL || tmp->couleur != couleur || tmp->t == carre || tmp->t == rond || tmp->t == crond || tmp->t == ccarre || tmp->t == rrond;
 }
 
 int deplacementPiece(liste *l, char x, char y, char a, char b){
-	piece *depart, *arrivee;
+	piece *depart, *arrivee, *tmp;
 	depart = getPieceByCoordListe(l, x, y);
-	arrivee = getPieceByCoordListe(l, a, b);
 	if(depart == NULL) return 0;
+	tmp = initPiece(depart->x, depart->y, depart->couleur, depart->t);
+	removeListe(l, depart);
+	arrivee = getPieceByCoordListe(l, a, b);
 	if(arrivee != NULL){
-		if(arrivee->couleur != depart->couleur){
+		if(arrivee->couleur != tmp->couleur){
 			removeListe(l, arrivee);
 		}else{
-			if(empilementPiece(depart, arrivee))
+			if(empilementPiece(tmp, arrivee))
 				removeListe(l, arrivee);
 			else
 				return 0;
 		}
 	}
-	depart->x = a;
-	depart->y = b;
+	tmp->x = a;
+	tmp->y = b;
+	addListe(l, tmp);
 	if(b == '0') return 3;
 	if(b == '9') return 2;
 	return 1;
