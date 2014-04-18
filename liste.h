@@ -20,8 +20,6 @@ void addListe(liste*, piece*);
 void removeListe(liste*, piece*);
 void printListe(liste*);
 piece *getPieceByCoordListe(liste*, char, char);
-int deplacementPiece(liste*, char, char, char, char);
-int deplacementAutoriser(liste*, char, char, char, char, char);
 int deploiementAutoriser(liste*, char, char, char, char, char, char, char, char);
 int deploiementPossibleSurCases(liste*, char, char, char, char, char);
 int deploiementPiece(liste*, char, char, char, char, char, char, char);

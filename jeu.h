@@ -2,6 +2,7 @@
 
 #ifndef H_JEU
 #define H_JEU
+#include "logic.h"
 
 typedef struct jeu{
 	liste *list;
