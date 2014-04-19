@@ -37,8 +37,8 @@ void startJeu(jeu *j){
 				a = input[3];
 				b = input[4];
 				printf("Déplacement de (%c,%c) en (%c,%c) : ", x, y, a, b);
-				if(estPieceDuJoueur(j->list, x, y, j->joueur) && deplacementValide(j->list, j->joueur, x, y, a, b)){
-					victoire = deplacementPiece(j->list, x, y, a, b);
+				if(estPieceDuJoueur(j->list, x, y, j->joueur) && deplaValide(j->list, j->joueur, x, y, a, b)){
+					victoire = deplaPiece(j->list, x, y, a, b);
 					if(victoire){
 						printf("[succès][%d]", victoire);
 						erreur = 0;

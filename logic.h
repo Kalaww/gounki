@@ -3,9 +3,14 @@
 #include "liste.h"
 #include "file.h"
 
-int deplacementValide(liste*, char, char, char, char, char);
-liste* deplacementCasesValides(liste*, type, char, char, char);
-int deplacementPossible(liste*, char, char, char);
-int deplacementPiece(liste*, char, char, char, char);
+int deplaValide(liste*, char, char, char, char, char);
+liste* deplaCasesPossibles(liste*, type, char, char, char);
+int deplaPossibleSurCase(liste*, char, char, char);
+int deplaPiece(liste*, char, char, char, char);
+
+liste *deploCasesPossibles(liste*, type, char, char, char);
+int deploPossibleSurCase(liste*, char, char, char);
+
+char chars(char, char, char);
 
 #endif
