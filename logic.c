@@ -207,7 +207,7 @@ liste *deploCasesPossibles(liste *l, type t, char couleur, char x, char y){
 	liste *cases = initListe();
 	int sens = (couleur == 'b')? 1 : -1;
 	
-	if(t == carre || t == rond) return 0;
+	if(t == carre || t == rond) return cases;
 	
 	if(t == ccarre){
 		/*rebond*/
@@ -258,11 +258,149 @@ liste *deploCasesPossibles(liste *l, type t, char couleur, char x, char y){
 			if(deploPossibleSurCase(l, couleur, x+1, y+sens) && deploPossibleSurCase(l, couleur, x+2, y+2*sens)) addListe(cases, initPiece(chars(x+1, x+2, 'a'), chars(y+sens, y+2*sens, '0'), couleur, t));
 		}
 	}
+	
+	if(t == crond){
+		/*CARRE*/
+		if(x > 'a' && deploPossibleSurCase(l, couleur, x-1, y)){
+			if(deploPossibleSurCase(l, couleur, x-2, y+sens)) addListe(cases, initPiece(chars(x-1, x-2, 'a'), chars(y, y+sens, '0'), couleur, t));
+			if(deploPossibleSurCase(l, couleur, x, y+sens)) addListe(cases, initPiece(chars(x-1, x, 'a'), chars(y, y+sens, '0'), couleur, t));
+		}
+		
+		if(x < 'h' && deploPossibleSurCase(l, couleur, x+1, y)){
+			if(deploPossibleSurCase(l, couleur, x, y+sens)) addListe(cases, initPiece(chars(x+1, x, 'a'), chars(y, y+sens, '0'), couleur, t));
+			if(deploPossibleSurCase(l, couleur, x+2, y+sens)) addListe(cases, initPiece(chars(x+2, x, 'a'), chars(y, y+sens, '0'), couleur, t));
+		}
+		
+		if((couleur == 'b' && y == '8') || (couleur == '1' && y == '1')){
+			if(x > 'a') addListe(cases, initPiece(chars(x, x-1, 'a'), chars(y+sens, y+sens, '0'), couleur, t));
+			if(x < 'h') addListe(cases, initPiece(chars(x, x+1, 'a'), chars(y+sens, y+sens, '0'), couleur, t));
+		}else if(((couleur == 'b' && y < '8') || (couleur == 'n' && y > '1')) && deploPossibleSurCase(l, couleur, x, y+sens)){
+			if(deploPossibleSurCase(l, couleur, x-1, y+2*sens)) addListe(cases, initPiece(chars(x, x-1, 'a'), chars(y+sens, y+2*sens, '0'), couleur, t));
+			if(deploPossibleSurCase(l, couleur, x+1, y+2*sens)) addListe(cases, initPiece(chars(x, x+1, 'a'), chars(y+sens, y+2*sens, '0'), couleur, t));
+		}
+		
+		
+		/*ROND*/
+		if(x > 'a' && deploPossibleSurCase(l, couleur, x-1, y+sens)){
+			if(deploPossibleSurCase(l, couleur, x-2, y+sens)) addListe(cases, initPiece(chars(x-1, x-2, 'a'), chars(y+sens, y+sens, '0'), couleur, t));
+			if(deploPossibleSurCase(l, couleur, x, y+sens)) addListe(cases, initPiece(chars(x-1, x, 'a'), chars(y+sens, y+sens, '0'), couleur, t));
+			
+			if((couleur == 'b' && y == '8') || (couleur == '1' && y == '1')){
+				addListe(cases, initPiece(chars(x-1, x-1, 'a'), chars(y+sens, y+sens, '0'), couleur, t));
+			}else{
+				if(deploPossibleSurCase(l, couleur, x-1, y+2*sens)) addListe(cases, initPiece(chars(x-1, x-1, 'a'), chars(y+sens, y+2*sens, '0'), couleur, t));
+			}
+		}
+		
+		if(x < 'h' && deploPossibleSurCase(l, couleur, x+1, y+sens)){
+			if(deploPossibleSurCase(l, couleur, x, y+sens)) addListe(cases, initPiece(chars(x+1, x, 'a'), chars(y+sens, y+sens, '0'), couleur, t));
+			if(deploPossibleSurCase(l, couleur, x+2, y+sens)) addListe(cases, initPiece(chars(x+1, x+2, 'a'), chars(y+sens, y+sens, '0'), couleur, t));
+			
+			if((couleur == 'b' && y == '8') || (couleur == '1' && y == '1')){
+				addListe(cases, initPiece(chars(x+1, x+1, 'a'), chars(y+sens, y+sens, '0'), couleur, t));
+			}else{
+				if(deploPossibleSurCase(l, couleur, x+1, y+2*sens)) addListe(cases, initPiece(chars(x+1, x+1, 'a'), chars(y+sens, y+2*sens, '0'), couleur, t));
+			}
+		}
+	}
+	
+	if(t == cccarre){
+		/*rebond*/
+		if(x == 'c'){
+			if(deploPossibleSurCase(l, couleur, x-1, y) && deploPossibleSurCase(l, couleur, x+1, y)) addListe(cases, initPiece(chars(x-1, x+1, 'a'), chars(y, y, '0'), couleur, t));
+		/*rebond*/
+		}else if(x == 'b'){
+			if(deploDoublePossibleSurCase(l, couleur, x-1, y) && deploPossibleSurCase(l, couleur, x-2, y)) addListe(cases, initPiece(chars(x-1, x-1, 'a'), chars(y, y, '0'), couleur,t));
+		/*normal*/
+		}else if(x > 'c'){
+			if(deploPossibleSurCase(l, couleur, x-1, y) && deploPossibleSurCase(l, couleur, x-2, y) && deploPossibleSurCase(l, couleur, x-3, y))
+				addListe(cases, initPiece(chars(x-1, x-3, 'a'), chars(y, y, '0'), couleur, t));
+		}
+		
+		/*rebond*/
+		if(x == 'f'){
+			if(deploPossibleSurCase(l, couleur, x+1, y) && deploPossibleSurCase(l, couleur, x-1, y)) addListe(cases, initPiece(chars(x+1, x-1, 'a'), chars(y, y, '0'), couleur, t));
+		/*rebond*/
+		}else if(x == 'g'){
+			if(deploDoublePossibleSurCase(l, couleur, x+1, y) && deploPossibleSurCase(l, couleur, x+2, y)) addListe(cases, initPiece(chars(x+1, x+1, 'a'), chars(y, y, '0'), couleur,t));
+		/*normal*/
+		}else if(x < 'g'){
+			if(deploPossibleSurCase(l, couleur, x+1, y) && deploPossibleSurCase(l, couleur, x+2, y) && deploPossibleSurCase(l, couleur, x+3, y))
+				addListe(cases, initPiece(chars(x+1, x+3, 'a'), chars(y, y, '0'), couleur, t));
+		}
+		
+		/*victoire*/
+		if((couleur == 'b' && y == '8') || (couleur == 'n' && y == '1')){
+			addListe(cases, initPiece(chars(x, x, 'a'), chars(y+sens, y+sens, '0'), couleur, t));
+		/*victoire*/
+		}else if((couleur == 'b' && y == '7') || (couleur == 'n' && y == '2')){
+			if(deploPossibleSurCase(l, couleur, x, y+sens)) addListe(cases, initPiece(chars(x, x, 'a'), chars(y+sens, y+2*sens, '0'), couleur, t));
+		/*normal*/
+		}else if((couleur == 'b' && y < '7') || (couleur == 'n' && y > '2')){
+			if(deploPossibleSurCase(l, couleur, x, y+sens) && deploPossibleSurCase(l, couleur, x, y+2*sens) && deploPossibleSurCase(l, couleur, x, y+3*sens))
+				addListe(cases, initPiece(chars(x, x, 'a'), chars(y+sens, y+3*sens, '0'), couleur, t));
+		}
+	}
+	
+	if(t == rrrond){
+		/*victoire*/
+		if(((couleur == 'b' && y == '8') || (couleur == 'n' && y == '1')) && x > 'a'){
+			addListe(cases, initPiece(chars(x-1, x-1, 'a'), chars(y+sens, y+sens, '0'), couleur, t));
+		/*victoire + rebond*/
+		}else if(((couleur == 'b' && y == '7') || (couleur == 'n' && y == '2')) && x == 'b'){
+			if(deploPossibleSurCase(l, couleur, x-1, y+sens)) addListe(cases, initPiece(chars(x-1, x, 'a'), chars(y+sens, y+2*sens, '0'), couleur, t));
+		/*victoire*/
+		}else if(((couleur == 'b' && y == '7') || (couleur == 'n' && y == '2')) && x > 'b'){
+			if(deploPossibleSurCase(l, couleur, x-1, y+sens)) addListe(cases, initPiece(chars(x-1, x-2, 'a'), chars(y+sens, y+2*sens, '0'), couleur, t));
+		/*rebond*/
+		}else if(x == 'c'){
+			if(deploPossibleSurCase(l, couleur, x-1, y+sens) && deploPossibleSurCase(l, couleur, x-2, y+2*sens) && deploPossibleSurCase(l, couleur, x-1, y+3*sens))
+				addListe(cases, initPiece(chars(x-1, x-1, 'a'), chars(y+sens, y+3*sens, '0'), couleur, t));
+		/*rebond*/
+		}else if(x == 'b'){
+			if(deploPossibleSurCase(l, couleur, x-1, y+sens) && deploPossibleSurCase(l, couleur, x, y+2*sens) && deploPossibleSurCase(l, couleur, x+1, y+3*sens))
+				addListe(cases, initPiece(chars(x-1, x+1, 'a'), chars(y+sens, y+3*sens, '0'), couleur, t));
+		/*normal*/
+		}else if(x > 'c'){
+			if(deploPossibleSurCase(l, couleur, x-1, y+sens) && deploPossibleSurCase(l, couleur, x-2, y+2*sens) && deploPossibleSurCase(l, couleur, x-3, y+3*sens))
+				addListe(cases, initPiece(chars(x-1, x-3, 'a'), chars(y+sens, y+3*sens, '0'), couleur, t));
+		}
+		
+		/*victoire*/
+		if(((couleur == 'b' && y == '8') || (couleur == 'n' && y == '1')) && x < 'h'){
+			addListe(cases, initPiece(chars(x+1, x+1, 'a'), chars(y+sens, y+sens, '0'), couleur, t));
+		/*victoire + rebond*/
+		}else if(((couleur == 'b' && y == '7') || (couleur == 'n' && y == '2')) && x == 'g'){
+			if(deploPossibleSurCase(l, couleur, x+1, y+sens)) addListe(cases, initPiece(chars(x+1, x, 'a'), chars(y+sens, y+2*sens, '0'), couleur, t));
+		/*victoire*/
+		}else if(((couleur == 'b' && y == '7') || (couleur == 'n' && y == '2')) && x < 'g'){
+			if(deploPossibleSurCase(l, couleur, x+1, y+sens)) addListe(cases, initPiece(chars(x+1, x+2, 'a'), chars(y+sens, y+2*sens, '0'), couleur, t));
+		/*rebond*/
+		}else if(x == 'f'){
+			if(deploPossibleSurCase(l, couleur, x+1, y+sens) && deploPossibleSurCase(l, couleur, x+2, y+2*sens) && deploPossibleSurCase(l, couleur, x+1, y+3*sens))
+				addListe(cases, initPiece(chars(x+1, x+1, 'a'), chars(y+sens, y+3*sens, '0'), couleur, t));
+		/*rebond*/
+		}else if(x == 'g'){
+			if(deploPossibleSurCase(l, couleur, x+1, y+sens) && deploPossibleSurCase(l, couleur, x, y+2*sens) && deploPossibleSurCase(l, couleur, x-1, y+3*sens))
+				addListe(cases, initPiece(chars(x+1, x-1, 'a'), chars(y+sens, y+3*sens, '0'), couleur, t));
+		/*normal*/
+		}else if(x < 'f'){
+			if(deploPossibleSurCase(l, couleur, x+1, y+sens) && deploPossibleSurCase(l, couleur, x+2, y+2*sens) && deploPossibleSurCase(l, couleur, x+3, y+3*sens))
+				addListe(cases, initPiece(chars(x+1, x+3, 'a'), chars(y+sens, y+3*sens, '0'), couleur, t));
+		}
+	}
+	
+	return cases;
 }
 
 int deploPossibleSurCase(liste *l, char couleur, char x, char y){
 	piece *tmp = getPieceByCoordListe(l, x, y);
 	return tmp == NULL || (tmp->couleur == couleur && (tmp->t == carre || tmp->t == rond || tmp->t == ccarre || tmp->t == rrond || tmp->t == crond));
+}
+
+int deploDoublePossibleSurCase(liste *l, char couleur, char x, char y){
+	piece *tmp = getPieceByCoordListe(l, x, y);
+	return tmp == NULL || (tmp->couleur == couleur && (tmp->t == carre || tmp->t == rond));
 }
 
 char chars(char a, char b, char ref){
