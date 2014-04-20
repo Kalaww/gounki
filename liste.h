@@ -2,6 +2,13 @@
 #define H_LISTE
 #include "piece.h"
 
+typedef struct coords{
+	char x;
+	char y;
+	char x1;
+	char y1;
+} coords;
+
 typedef struct noeud{
 	piece *p;
 	struct noeud *next;
@@ -12,6 +19,16 @@ typedef struct liste{
 	struct noeud *first;
 } liste;
 
+typedef struct noeudC{
+	coords *c;
+	struct noeudC *next;
+} noeudC;
+
+typedef struct listeC{
+	int length;
+	struct noeudC *first;
+} listeC;
+
 liste *initListe();
 void freeListe(liste*);
 void freeNoeud(noeud*);
@@ -20,8 +37,15 @@ void addListe(liste*, piece*);
 void removeListe(liste*, piece*);
 void printListe(liste*);
 piece *getPieceByCoordListe(liste*, char, char);
-int deploiementAutoriser(liste*, char, char, char, char, char, char, char, char);
-int deploiementPossibleSurCases(liste*, char, char, char, char, char);
-int deploiementPiece(liste*, char, char, char, char, char, char, char);
+
+listeC *initListeC();
+void freeListeC(listeC*);
+void freeNoeudC(noeudC*);
+void freeNoeudRecursiveC(noeudC*);
+void addListeC(listeC*, coords*);
+void removeListeC(listeC*, coords*);
+
+int equalsCoords(coords*, coords*);
+coords *initCoords(char, char, char, char);
 
 #endif

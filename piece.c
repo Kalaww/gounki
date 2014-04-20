@@ -5,7 +5,9 @@
 piece *initPiece(char x, char y, char couleur, type t){
 	piece *tmp = malloc(sizeof(piece));
 	tmp->x = x;
-	tmp->y = y;
+	if(y > '9') tmp->y = '9';
+	else if(y < '0') tmp->y = '0';
+	else tmp->y = y;
 	tmp->couleur = couleur;
 	tmp->t = t;
 	return tmp;

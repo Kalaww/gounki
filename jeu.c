@@ -18,8 +18,8 @@ void freeJeu(jeu *j){
 }
 
 void startJeu(jeu *j){
-	char sortie = 0, x, y, a, b, a1, b1, commencePar, erreur = 1, *vide;
-	char input[10];
+	char sortie = 0, x, y, a, b, a1, b1, a2, b2, commencePar, erreur = 1, *vide;
+	char input[20];
 	int victoire = 0;
 	while(sortie != 1 && victoire < 2){
 		printPlateau(j);
@@ -47,7 +47,7 @@ void startJeu(jeu *j){
 					printf("[impossible]");
 				}
 				printf("\n");
-			}else if(estDeploiement(input, j->joueur)){
+			}else if(estDeploiementDouble(input, j->joueur)){
 				x = input[0];
 				y = input[1];
 				a1 = input[3];
@@ -55,10 +55,32 @@ void startJeu(jeu *j){
 				a = input[6];
 				b = input[7];
 				commencePar = input[2];
-				printf("Déploiement de (%c,%c) en (%c,%c) commençant par les %s en (%c,%c) : ", x, y, a, b, (commencePar == '+')? "carrés" : "ronds", a1, b1);
-				if(estPieceDuJoueur(j->list, x, y, j->joueur) && deploiementAutoriser(j->list, j->joueur, commencePar, x, y, a, b, a1, b1)){
+				printf("Déploiement de (%c,%c) en (%c,%c) commençant par les %s en (%c,%c)\n", x, y, a, b, (commencePar == '+')? "carrés" : "ronds", a1, b1);
+				if(estPieceDuJoueur(j->list, x, y, j->joueur) && deploValide(j->list, j->joueur, commencePar, x, y, a, b, a1, b1)){
 					printf("{{Deploiement autorisée}}\n");
-					victoire = deploiementPiece(j->list, commencePar, x, y, a, b, a1, b1);
+					victoire = deploPieceDouble(j->list, j->joueur, commencePar, x, y, a, b, a1, b1);
+					if(victoire){
+						printf("[succès][%d]", victoire);
+						erreur = 0;
+					}
+				}else{
+					printf("[impossible]");
+				}
+				printf("\n");
+			}else if(estDeploiementTriple(input, j->joueur)){
+				x = input[0];
+				y = input[1];
+				a1 = input[3];
+				b1 = input[4];
+				a2 = input[6];
+				b2 = input[7];
+				a = input[9];
+				b = input[10];
+				commencePar = input[2];
+				printf("Déploiement de (%c,%c) en (%c,%c) commençant par les %s en (%c,%c)(%c,%c)\n", x, y, a, b, (commencePar == '+')? "carrés" : "ronds", a1, b1, a2, b2);
+				if(estPieceDuJoueur(j->list, x, y, j->joueur) && deploValide(j->list, j->joueur, commencePar, x, y, a, b, a1, b1)){
+					printf("{{Deploiement autorisée}}\n");
+					victoire = deploPieceTriple(j->list, j->joueur, commencePar, x, y, a, b, a1, b1, a2, b2);
 					if(victoire){
 						printf("[succès][%d]", victoire);
 						erreur = 0;
@@ -90,7 +112,7 @@ int estMouvement(char input[], char couleur){
 		&& ((couleur == 'n' && input[4] >= '0') || (input[4] >= '1')) && ((couleur == 'b' && input[5]  <= '9') || (input[5] <= '8'));
 }
 
-int estDeploiement(char input[], char couleur){
+int estDeploiementDouble(char input[], char couleur){
 	return strlen(input) == 8 
 		&& input[0] >= 'a' && input[0] <= 'h'
 		&& input[1] >= '1' && input[1] <= '8'
@@ -100,6 +122,21 @@ int estDeploiement(char input[], char couleur){
 		&& input[5] == '-'
 		&& input[6] >= 'a' && input[6] <= 'h'
 		&& ((couleur == 'n' && input[7] >= '0') || (input[7] >= '1')) && ((couleur == 'b' && input[7]  <= '9') || (input[7] <= '8'));
+}
+
+int estDeploiementTriple(char input[], char couleur){
+	return strlen(input) == 11 
+		&& input[0] >= 'a' && input[0] <= 'h'
+		&& input[1] >= '1' && input[1] <= '8'
+		&& (input[2] == '+' || input[2] == '*')
+		&& input[3] >= 'a' && input[3] <= 'h'
+		&& ((couleur == 'n' && input[4] >= '0') || (input[4] >= '1')) && ((couleur == 'b' && input[5]  <= '9') || (input[5] <= '8'))
+		&& input[5] == '-'
+		&& input[6] >= 'a' && input[6] <= 'h'
+		&& ((couleur == 'n' && input[7] >= '0') || (input[7] >= '1')) && ((couleur == 'b' && input[7]  <= '9') || (input[7] <= '8'))
+		&& input[8] == '-'
+		&& input[9] >= 'a' && input[9] <= 'h'
+		&& ((couleur == 'n' && input[10] >= '0') || (input[10] >= '1')) && ((couleur == 'b' && input[10]  <= '9') || (input[10] <= '8'));
 }
 
 int estPieceDuJoueur(liste *l, char x, char y, char couleur){
