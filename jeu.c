@@ -94,6 +94,7 @@ void startJeu(jeu *j){
 			}
 		}while(erreur);
 		j->joueur = (j->joueur == 'b')? 'n' : 'b';
+		if(j->joueur == 'b') j->tour++;
 	}
 	if(victoire > 1){
 		if(victoire == 2) printf("Victoire du joueur Blanc !\n");
@@ -171,7 +172,7 @@ void initPlateau(liste *l){
 void printPlateau(jeu *j){
 	char colonne, ligne;
 	piece *p;
-	printf("     a  b  c  d  e  f  g  h\n"); 	
+	printf("     a  b  c  d  e  f  g  h\n");
 	printf("    -------------------------\n");
 	for(ligne = '8'; ligne >= '1'; ligne--){
 		printf(" %c | ", ligne);
@@ -183,7 +184,12 @@ void printPlateau(jeu *j){
 				printf(" . ");
 		}
 		printf("|");
-		if(ligne == '5') printf("  TOUR %d (%s)", j->tour, (j->joueur == 'b')? "blanc" : "noir");
+		if(ligne == '8') printf("    1: c    2: r");
+		if(ligne == '7') printf("    3: cc   4: rr");
+		if(ligne == '6') printf("    5: ccc  6: rrr");
+		if(ligne == '5') printf("    7: cr   8: ccr");
+		if(ligne == '4') printf("    9: crr");
+		if(ligne == '2') printf("    TOUR %d (%s)", j->tour, (j->joueur == 'b')? "blanc" : "noir");
 		printf("\n");
 	}
 	printf("    -------------------------\n");
