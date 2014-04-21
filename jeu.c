@@ -37,7 +37,7 @@ void startJeu(jeu *j){
 			if(strlen(input) == 1 && input[0] == 'q'){
 				erreur = 0;
 				sortie = 1;
-			}else if(strlen(input) == 1 && input[0] == 'h'){
+			}else if(strlen(input) == 1 && input[0] == 'c'){
 				printf("Historique des coups :\n");
 				printListeH(j->coups);
 			}else if(strlen(input) == 1 && input[0] == 'r'){
@@ -47,6 +47,8 @@ void startJeu(jeu *j){
 				j->joueur = (j->joueur = 'b')? 'n' : 'b';
 				if(j->joueur == 'n') j->tour--;
 				erreur = 0;
+			}else if(strlen(input) == 1 && input[0] == 'h'){
+				printf("c : historique des coups\nr : annuler dernier coups\nq : quitter\n");
 			}else if(estMouvement(input, j->joueur)){
 				x = input[0];
 				y = input[1];
@@ -246,5 +248,5 @@ void printPlateau(jeu *j){
 		if(ligne == '2') printf("    TOUR %d (%s)", j->tour, (j->joueur == 'b')? "blanc" : "noir");
 		printf("\n");
 	}
-	printf("    -------------------------\n");
+	printf("    -------------------------     h: liste des commandes\n");
 }
