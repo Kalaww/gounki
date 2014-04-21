@@ -29,6 +29,17 @@ typedef struct listeC{
 	struct noeudC *first;
 } listeC;
 
+typedef struct listeH{
+	int length;
+	struct noeudH *first;
+	struct noeudH *last;
+} listeH;
+
+typedef struct noeudH{
+	char c[20];
+	struct noeudH *next;
+} noeudH;
+
 liste *initListe();
 void freeListe(liste*);
 void freeNoeud(noeud*);
@@ -48,5 +59,13 @@ void removeListeC(listeC*, coords*);
 int equalsCoords(coords*, coords*);
 coords *initCoords(char, char, char, char);
 coords *initCoord(char, char);
+
+listeH *initListeH();
+void freeListeH(listeH*);
+void freeNoeudH(noeudH*);
+void freeNoeudRecursiveH(noeudH*);
+void addListeH(listeH*, char*);
+void removeListeH(listeH*, char*);
+void printListeH(listeH*);
 
 #endif

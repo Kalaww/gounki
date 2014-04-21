@@ -8,6 +8,7 @@ typedef struct jeu{
 	liste *list;
 	char joueur;
 	int tour;
+	listeH *coups;
 } jeu;
 
 jeu *initJeu();

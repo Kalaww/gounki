@@ -558,3 +558,8 @@ int deploDoublePossibleSurCase(liste *l, char couleur, char x, char y){
 	piece *tmp = getPieceByCoordListe(l, x, y);
 	return tmp == NULL || (tmp->couleur == couleur && (tmp->t == carre || tmp->t == rond));
 }
+
+
+/* HISTORIQUE DES COUPS */
+
+

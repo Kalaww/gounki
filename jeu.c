@@ -8,21 +8,27 @@ jeu *initJeu(){
 	j->list = initListe();
 	j->joueur = 'b';
 	j->tour = 1;
+	j->coups = initListeH();
 	initPlateau(j->list);
 	return j;
 }
 
 void freeJeu(jeu *j){
-	if(j) freeListe(j->list);
+	if(j){
+		freeListe(j->list);
+		freeListeH(j->coups);
+	}
 	free(j);
 }
 
 void startJeu(jeu *j){
 	char sortie = 0, x, y, a, b, a1, b1, a2, b2, commencePar, erreur = 1, *vide;
 	char input[20];
-	int victoire = 0;
+	int victoire = 0, coupsSucces = 0;
 	while(sortie != 1 && victoire < 2){
 		printPlateau(j);
+		erreur = 1;
+		coupsSucces = 0;
 		do{
 			printf("Quelle pièce souhaitez vous déplacer ? ");
 			fgets(input, sizeof(input), stdin);
@@ -39,6 +45,7 @@ void startJeu(jeu *j){
 				printf("Déplacement de (%c,%c) en (%c,%c) : ", x, y, a, b);
 				if(estPieceDuJoueur(j->list, x, y, j->joueur) && deplaValide(j->list, j->joueur, x, y, a, b)){
 					victoire = deplaPiece(j->list, x, y, a, b);
+					coupsSucces = 1;
 					if(victoire){
 						printf("[succès][%d]", victoire);
 						erreur = 0;
@@ -57,8 +64,8 @@ void startJeu(jeu *j){
 				commencePar = input[2];
 				printf("Déploiement de (%c,%c) en (%c,%c) commençant par les %s en (%c,%c)\n", x, y, a, b, (commencePar == '+')? "carrés" : "ronds", a1, b1);
 				if(estPieceDuJoueur(j->list, x, y, j->joueur) && deploValide(j->list, j->joueur, commencePar, x, y, a, b, a1, b1)){
-					printf("{{Deploiement autorisée}}\n");
 					victoire = deploPieceDouble(j->list, j->joueur, commencePar, x, y, a, b, a1, b1);
+					coupsSucces = 1;
 					if(victoire){
 						printf("[succès][%d]", victoire);
 						erreur = 0;
@@ -79,7 +86,7 @@ void startJeu(jeu *j){
 				commencePar = input[2];
 				printf("Déploiement de (%c,%c) en (%c,%c) commençant par les %s en (%c,%c)(%c,%c)\n", x, y, a, b, (commencePar == '+')? "carrés" : "ronds", a1, b1, a2, b2);
 				if(estPieceDuJoueur(j->list, x, y, j->joueur) && deploValide(j->list, j->joueur, commencePar, x, y, a, b, a1, b1)){
-					printf("{{Deploiement autorisée}}\n");
+					coupsSucces = 1;
 					victoire = deploPieceTriple(j->list, j->joueur, commencePar, x, y, a, b, a1, b1, a2, b2);
 					if(victoire){
 						printf("[succès][%d]", victoire);
@@ -93,13 +100,15 @@ void startJeu(jeu *j){
 				printf("Mauvaises coordonnées !\n");
 			}
 		}while(erreur);
+		if(coupsSucces) addListeH(j->coups, input);
 		j->joueur = (j->joueur == 'b')? 'n' : 'b';
 		if(j->joueur == 'b') j->tour++;
+		printListeH(j->coups);
 	}
 	if(victoire > 1){
 		if(victoire == 2) printf("Victoire du joueur Blanc !\n");
 		else if(victoire == 3) printf("Victoire du joueur Noir !\n");
-		else printf("Le jeu s'est terminé sans vicroire.\n");
+		else printf("Le jeu s'est terminé sans victoire.\n");
 	}
 	printf("Fermeture du jeu\n");
 }

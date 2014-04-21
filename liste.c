@@ -3,6 +3,8 @@
 #include <string.h>
 #include "liste.h"
 
+/* LISTE PIECES */
+
 liste *initListe(){
 	liste *l = malloc(sizeof(liste));
 	l->length = 0;
@@ -95,6 +97,7 @@ void freeListeC(listeC *l){
 
 void freeNoeudC(noeudC *n){
 	if(!n) return;
+	free(n->c);
 	free(n);
 }
 
@@ -115,7 +118,7 @@ void removeListeC(listeC *l, coords *p){
 	noeudC *courant, *tmp;
 	if(l == NULL || l->first == NULL || l->length == 0) return;
 	courant = l->first;
-	if(equalsCoords(p, courant->c)){
+	if(equalsCoords(p, courant->next->c)){
 		l->first = courant->next;
 		l->length--;
 		freeNoeudC(courant);
@@ -160,3 +163,72 @@ int equalsCoords(coords *a, coords *b){
 	return a->x == b->x && a->y == b->y && a->x1 == b->x1 && a->y1 == b->y1;
 }
 
+
+/* LISTE COUPS */
+
+listeH *initListeH(){
+	listeH *l = malloc(sizeof(listeH));
+	l->length = 0;
+	l->first = NULL;
+	l->last = NULL;
+	return l;
+}
+
+void freeListeH(listeH *l){
+	if(l && l->first) freeNoeudRecursiveH(l->first);
+	free(l);
+}
+
+void freeNoeudH(noeudH *n){
+	if(!n) return;
+	free(n);
+}
+
+void freeNoeudRecursiveH(noeudH *n){
+	if(n && n->next) freeNoeudRecursiveH(n->next);
+	freeNoeudH(n);
+}
+
+void addListeH(listeH *l, char *s){
+	noeudH *n = malloc(sizeof(noeudH));
+	strcpy(n->c, s);
+	n->next = NULL;
+	if(l->first == NULL) l->first = n;
+	if(l->last) l->last->next = n;
+	l->last = n;
+	l->length++;
+}
+
+void removeListeH(listeH *l, char *p){
+	noeudH *courant, *tmp;
+	if(l == NULL || l->first == NULL || l->length == 0) return;
+	courant = l->first;
+	if(strcmp(p, courant->c) == 0){
+		if(l->first == l->last) l->last = NULL;
+		l->first = courant->next;
+		l->length--;
+		freeNoeudH(courant);
+		return;
+	}
+	while(courant->next != NULL){
+		if(strcmp(p, courant->next->c) == 0){
+			tmp = courant->next;
+			courant->next = courant->next->next;
+			freeNoeudH(tmp);
+			if(courant->next == NULL) l->last = courant;
+			l->length--;
+			return;
+		}
+		courant = courant->next;
+	}
+}
+
+void printListeH(listeH *l){
+	noeudH* courant;
+	courant = l->first;
+	while(courant != NULL){
+		printf("[%s]", courant->c);
+		courant = courant->next;
+	}
+	printf("\n");
+}
