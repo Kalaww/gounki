@@ -19,7 +19,7 @@ int deplaValide(liste *l, char couleur, char x, char y, char a, char b){
 	tmp = cases->first;
 	while(tmp != NULL){
 		printf("Case possible : %c,%c\n", tmp->c->x, tmp->c->y);
-		if(tmp->c->x1 == a && tmp->c->x == b) return 1;
+		if(tmp->c->x == a && tmp->c->y == b) return 1;
 		tmp = tmp->next;
 	}
 	
@@ -31,59 +31,59 @@ listeC* deplaCasesPossibles(liste *l, type t, char couleur, char x, char y){
 	int sens = (couleur == 'b')? 1 : -1;
 	
 	if(t == carre || t == crond || t == crrond){
-		if(x > 'a' && deplaPossibleSurCase(l, couleur, x-1, y)) addListeC(cases, initCoords(x-1, y, 0, 0));
-		if(x < 'h' && deplaPossibleSurCase(l, couleur, x+1, y)) addListeC(cases, initCoords(x+1, y, 0, 0));
-		if(deplaPossibleSurCase(l, couleur, x, y+sens)) addListeC(cases, initCoords(x, y+sens, 0, 0));
+		if(x > 'a' && deplaPossibleSurCase(l, couleur, x-1, y)) addListeC(cases, initCoord(x-1, y));
+		if(x < 'h' && deplaPossibleSurCase(l, couleur, x+1, y)) addListeC(cases, initCoord(x+1, y));
+		if(deplaPossibleSurCase(l, couleur, x, y+sens)) addListeC(cases, initCoord(x, y+sens));
 	}
 	
 	if(t == rond || t == crond || t == ccrond){
-		if(x > 'a' && deplaPossibleSurCase(l, couleur, x-1, y+sens)) addListeC(cases, initCoords(x-1, y+sens, 0, 0));
-		if(x < 'h' && deplaPossibleSurCase(l, couleur, x+1, y+sens)) addListeC(cases, initCoords(x+1, y+sens, 0, 0));
+		if(x > 'a' && deplaPossibleSurCase(l, couleur, x-1, y+sens)) addListeC(cases, initCoord(x-1, y+sens));
+		if(x < 'h' && deplaPossibleSurCase(l, couleur, x+1, y+sens)) addListeC(cases, initCoord(x+1, y+sens));
 	}
 	
 	if(t == ccarre || t == ccrond){
 		/*rebond*/
 		if(x == 'b'){
-			if(getPieceByCoordListe(l, x-1, y) == NULL) addListeC(cases, initCoords(x, y, 0, 0));
+			if(getPieceByCoordListe(l, x-1, y) == NULL) addListeC(cases, initCoord(x, y));
 		/*normal*/
 		}else if(x > 'b'){
 			if(getPieceByCoordListe(l, x-1, y) == NULL && deplaPossibleSurCase(l, couleur, x-2, y))
-				addListeC(cases, initCoords(x-2, y, 0, 0));
+				addListeC(cases, initCoord(x-2, y));
 		}
 		
 		/*rebond*/
 		if(x == 'g'){
-			if(getPieceByCoordListe(l, x+1, y) == NULL) addListeC(cases, initCoords(x, y, 0, 0));
+			if(getPieceByCoordListe(l, x+1, y) == NULL) addListeC(cases, initCoord(x, y));
 		/*normal*/
 		}else if(x < 'g'){
 			if(getPieceByCoordListe(l, x+1, y) == NULL && deplaPossibleSurCase(l, couleur, x+2, y))
-				addListeC(cases, initCoords(x+2, y, 0, 0));
+				addListeC(cases, initCoord(x+2, y));
 		}
 		
 		/*normal*/
 		if(getPieceByCoordListe(l, x, y+sens) == NULL && deplaPossibleSurCase(l, couleur, x, y+2+sens))
-			addListeC(cases, initCoords(x, y+2*sens, 0, 0));
+			addListeC(cases, initCoord(x, y+2*sens));
 	}
 	
 	if(t == rrond || t == crrond){
 		/*rebond*/
 		if(x == 'b'){
 			if(getPieceByCoordListe(l, x-1, y+sens) == NULL && deplaPossibleSurCase(l, couleur, x, y+2*sens))
-				addListeC(cases, initCoords(x, y+2*sens, 0, 0));
+				addListeC(cases, initCoord(x, y+2*sens));
 		/*normal*/
 		}else if(x > 'b'){
 			if(getPieceByCoordListe(l, x-1, y+sens) == NULL && deplaPossibleSurCase(l, couleur, x-2, y+2*sens))
-				addListeC(cases, initCoords(x-2, y+2*sens, 0, 0));
+				addListeC(cases, initCoord(x-2, y+2*sens));
 		}
 		
 		/*rebond*/
 		if(x == 'g'){
 			if(getPieceByCoordListe(l, x+1, y+sens) == NULL && deplaPossibleSurCase(l, couleur, x, y+2*sens))
-				addListeC(cases, initCoords(x, y+2*sens, 0, 0));
+				addListeC(cases, initCoord(x, y+2*sens));
 		/*normal*/
 		}else if(x < 'g'){
 			if(getPieceByCoordListe(l, x+1, y+sens) == NULL && deplaPossibleSurCase(l, couleur, x+2, y+2*sens))
-				addListeC(cases, initCoords(x+2, y+2*sens, 0, 0));
+				addListeC(cases, initCoord(x+2, y+2*sens));
 		}
 	}
 	
@@ -91,62 +91,62 @@ listeC* deplaCasesPossibles(liste *l, type t, char couleur, char x, char y){
 		/*rebond*/
 		if(x == 'c'){
 			if(getPieceByCoordListe(l, x-1, y) == NULL && getPieceByCoordListe(l, x-2, y) == NULL)
-				addListeC(cases, initCoords(x-1, y, 0, 0));
+				addListeC(cases, initCoord(x-1, y));
 		/*rebond*/
 		}else if(x == 'b'){
 			if(getPieceByCoordListe(l, x-1, y) == NULL && deplaPossibleSurCase(l, couleur, x+1, y))
-				addListeC(cases, initCoords(x+1, y, couleur,t));
+				addListeC(cases, initCoord(x+1, y));
 		/*normal*/
 		}else if(x > 'c'){
 			if(getPieceByCoordListe(l, x-1, y) == NULL && getPieceByCoordListe(l, x-2, y) == NULL && deplaPossibleSurCase(l, couleur, x-3, y))
-				addListeC(cases, initCoords(x-3, y, 0, 0));
+				addListeC(cases, initCoord(x-3, y));
 		}
 		
 		/*rebond*/
 		if(x == 'f'){
 			if(getPieceByCoordListe(l, x+1, y) == NULL && getPieceByCoordListe(l, x+2, y) == NULL)
-				addListeC(cases, initCoords(x+1, y, 0, 0));
+				addListeC(cases, initCoord(x+1, y));
 		/*rebond*/
 		}else if(x == 'g'){
 			if(getPieceByCoordListe(l, x+1, y) == NULL && deplaPossibleSurCase(l, couleur, x-1, y))
-				addListeC(cases, initCoords(x-1, y, 0, 0));
+				addListeC(cases, initCoord(x-1, y));
 		/*normal*/
 		}else if(x < 'g'){
 			if(getPieceByCoordListe(l, x+1, y) == NULL && getPieceByCoordListe(l, x+2, y) == NULL && deplaPossibleSurCase(l, couleur, x+3, y))
-				addListeC(cases, initCoords(x+3, y, 0, 0));
+				addListeC(cases, initCoord(x+3, y));
 		}
 		
 		/*normal*/
-		if(getPieceByCoordListe(l, x, y+sens) == NULL && getPieceByCoordListe(l, x, y+2*sens) == NULL && deplaPossibleSurCase(l, couleur, x, y+3+sens)) addListeC(cases, initCoords(x, y+3*sens, 0, 0));
+		if(getPieceByCoordListe(l, x, y+sens) == NULL && getPieceByCoordListe(l, x, y+2*sens) == NULL && deplaPossibleSurCase(l, couleur, x, y+3+sens)) addListeC(cases, initCoord(x, y+3*sens));
 	}
 	
 	if(t == rrrond){
 		/*rebond*/
 		if(x == 'c'){
 			if(getPieceByCoordListe(l, x-1, y+sens) == NULL && getPieceByCoordListe(l, x-2, y+sens) == NULL && deplaPossibleSurCase(l, couleur, x-1, y+3*sens))
-				addListeC(cases, initCoords(x-1, y+3*sens, 0, 0));
+				addListeC(cases, initCoord(x-1, y+3*sens));
 		/*rebond*/
 		}else if(x == 'b'){
 			if(getPieceByCoordListe(l, x-1, y+sens) == NULL && getPieceByCoordListe(l, x, y+2*sens) == NULL && deplaPossibleSurCase(l, couleur, x+1, y+3*sens))
-				addListeC(cases, initCoords(x+1, y+3*sens, 0, 0));
+				addListeC(cases, initCoord(x+1, y+3*sens));
 		/*normal*/
 		}else if(x > 'c'){
 			if(getPieceByCoordListe(l, x-1, y+sens) == NULL && getPieceByCoordListe(l, x-2, y+2*sens) == NULL && deplaPossibleSurCase(l, couleur, x-3, y+3*sens))
-				addListeC(cases, initCoords(x-3, y+3*sens, 0, 0));
+				addListeC(cases, initCoord(x-3, y+3*sens));
 		}
 		
 		/*rebond*/
 		if(x == 'f'){
 			if(getPieceByCoordListe(l, x+1, y+sens) == NULL && getPieceByCoordListe(l, x+2, y+2*sens) == NULL && deplaPossibleSurCase(l, couleur, x+1, y+3*sens))
-				addListeC(cases, initCoords(x+1, y+3*sens, 0, 0));
+				addListeC(cases, initCoord(x+1, y+3*sens));
 		/*rebond*/
 		}else if(x == 'g'){
 			if(getPieceByCoordListe(l, x+1, y+sens) == NULL && getPieceByCoordListe(l, x, y+2*sens) == NULL && deplaPossibleSurCase(l, couleur, x-1, y+3*sens))
-				addListeC(cases, initCoords(x-1, y+3*sens, 0, 0));
+				addListeC(cases, initCoord(x-1, y+3*sens));
 		/*normal*/
 		}else if(x < 'f'){
 			if(getPieceByCoordListe(l, x+1, y+sens) == NULL && getPieceByCoordListe(l, x+2, y+2*sens) == NULL && deplaPossibleSurCase(l, couleur, x+3, y+3*sens))
-				addListeC(cases, initCoords(x+3, y+3*sens, 0, 0));
+				addListeC(cases, initCoord(x+3, y+3*sens));
 		}
 	}
 	

@@ -147,6 +147,15 @@ coords *initCoords(char x1, char x, char y1, char y){
 	return tmp;
 }
 
+coords *initCoord(char x, char y){
+	coords *tmp = malloc(sizeof(coords));
+	tmp->x = x;
+	if(y > '9') tmp->y = '9';
+	else if(y < '0') tmp->y = '0';
+	else tmp->y = y;
+	return tmp;
+}
+
 int equalsCoords(coords *a, coords *b){
 	return a->x == b->x && a->y == b->y && a->x1 == b->x1 && a->y1 == b->y1;
 }

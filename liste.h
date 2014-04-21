@@ -47,5 +47,6 @@ void removeListeC(listeC*, coords*);
 
 int equalsCoords(coords*, coords*);
 coords *initCoords(char, char, char, char);
+coords *initCoord(char, char);
 
 #endif
