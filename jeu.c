@@ -3,10 +3,12 @@
 #include <string.h>
 #include "jeu.h"
 
-jeu *initJeu(){
+jeu *initJeu(int blanc, int noir){
 	jeu *j = malloc(sizeof(jeu));
 	j->list = initListe();
 	j->joueur = 'b';
+	j->blanc = blanc;
+	j->noir = noir;
 	j->tour = 1;
 	j->coups = initListeH();
 	initPlateau(j->list);

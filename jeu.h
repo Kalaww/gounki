@@ -8,10 +8,12 @@ typedef struct jeu{
 	liste *list;
 	char joueur;
 	int tour;
+	int blanc;
+	int noir;
 	listeH *coups;
 } jeu;
 
-jeu *initJeu();
+jeu *initJeu(int, int);
 void freeJeu(jeu*);
 void startJeu(jeu*);
 int estMouvement(char[], char);
