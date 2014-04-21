@@ -18,7 +18,8 @@ int estMouvement(char[], char);
 int estDeploiementDouble(char[], char);
 int estDeploiementTriple(char[], char);
 int estPieceDuJoueur(liste*, char, char, char);
+void jouerHistorique(jeu *);
 void initPlateau(liste*);
-void printPlateau(jeu *j);
+void printPlateau(jeu *);
 
 #endif
