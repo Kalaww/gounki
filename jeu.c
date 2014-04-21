@@ -26,6 +26,7 @@ void freeJeu(jeu *j){
 
 void startJeu(jeu *j){
 	char sortie = 0, x, y, a, b, a1, b1, a2, b2, commencePar, erreur = 1, *vide;
+	char nomSauvegarde[100];
 	char input[20];
 	int victoire = 0, coupsSucces = 0;
 	while(sortie != 1 && victoire < 2){
@@ -51,7 +52,13 @@ void startJeu(jeu *j){
 				if(j->joueur == 'n') j->tour--;
 				erreur = 0;
 			}else if(strlen(input) == 1 && input[0] == 'h'){
-				printf("c : historique des coups\nr : annuler dernier coups\nq : quitter\n");
+				printf("c : historique des coups\nr : annuler dernier coups\ns : sauvegarder l'historique des coups\nq : quitter\n");
+			}else if(strlen(input) == 1 && input[0] == 's'){
+				printf("Nom du fichier de sauvegarde ? ");
+				fgets(nomSauvegarde, sizeof(nomSauvegarde), stdin);
+				vide = strchr(nomSauvegarde, '\n');
+				if(vide) *vide = 0;
+				sauvegarderHistorique(j, nomSauvegarde);
 			}else if(estMouvement(input, j->joueur)){
 				x = input[0];
 				y = input[1];
@@ -229,8 +236,27 @@ void chargerFichierTest(jeu *j, char *nomFichier){
 	}
 	
 	if(ligne) free(ligne);
-	
 	jouerHistorique(j);
+	fclose(file);
+}
+
+void sauvegarderHistorique(jeu *j, char *nomFichier){
+	FILE *file;
+	noeudH *courant;
+	
+	file = fopen(nomFichier, "w");
+	if(file == NULL){
+		printf("Impossible d'ouvrir le fichier\n");
+		return;
+	}
+	
+	courant = j->coups->first;
+	while(courant != NULL){
+		fprintf(file, "%s\n", courant->c);
+		courant = courant->next;
+	}
+	
+	fclose(file);
 }
 
 void initPlateau(liste *l){
