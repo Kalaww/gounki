@@ -3,7 +3,7 @@
 #include "liste.h"
 
 int deplaValide(liste*, char, char, char, char, char);
-liste* deplaCasesPossibles(liste*, type, char, char, char);
+listeC* deplaCasesPossibles(liste*, type, char, char, char);
 int deplaPossibleSurCase(liste*, char, char, char);
 int deplaPiece(liste*, char, char, char, char);
 
