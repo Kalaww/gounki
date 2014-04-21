@@ -23,5 +23,6 @@ int estPieceDuJoueur(liste*, char, char, char);
 void jouerHistorique(jeu *);
 void initPlateau(liste*);
 void printPlateau(jeu *);
+void chargerFichierTest(jeu*, char*);
 
 #endif

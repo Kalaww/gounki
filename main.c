@@ -51,6 +51,7 @@ int main(int argc, char *argv[]){
 	printf("c: %s | t: %s\n", fichierCharger, fichierTest);
 	
 	j = initJeu(b, n);
+	if(fichierTest != NULL) chargerFichierTest(j, fichierTest);
 	startJeu(j);
 	freeJeu(j);
 	return 0;

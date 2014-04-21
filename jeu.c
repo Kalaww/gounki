@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -195,6 +196,7 @@ void jouerHistorique(jeu *j){
 			victoire = deploPieceTriple(j->list, j->joueur, courant->c[2], courant->c[0], courant->c[1], courant->c[9], courant->c[10], courant->c[3], courant->c[4], courant->c[6], courant->c[7]);
 		}else{
 			printf("ERREUR : %s n'est pas un coups reconnu", courant->c);
+			exit(1);
 		}
 		
 		if(victoire > 1){
@@ -208,6 +210,27 @@ void jouerHistorique(jeu *j){
 		if(j->joueur == 'b') j->tour++;
 		courant = courant->next;
 	}
+}
+
+void chargerFichierTest(jeu *j, char *nomFichier){
+	FILE *file;
+	char * ligne = NULL;
+	size_t len = 0;
+	
+	file = fopen(nomFichier, "r");
+	if(file == NULL){
+		printf("Impossible d'ouvrir le fichier\n");
+		exit(1);
+	}
+	
+	while(getline(&ligne, &len, file) != -1){
+		ligne[strlen(ligne)-1] = '\0';
+		addListeH(j->coups, ligne);
+	}
+	
+	if(ligne) free(ligne);
+	
+	jouerHistorique(j);
 }
 
 void initPlateau(liste *l){
