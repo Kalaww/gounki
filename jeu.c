@@ -139,6 +139,7 @@ void startJeu(jeu *j){
 		}while(erreur);
 		if(coupsSucces) addListeH(j->coups, input);
 		j->joueur = (j->joueur == 'b')? 'n' : 'b';
+		if(testVictoireAucunePiece(j->list, j->joueur) == 1) victoire = (j->joueur == 'b')? 3 : 2;
 		if(j->joueur == 'b') j->tour++;
 		printListeH(j->coups);
 	}
@@ -204,7 +205,7 @@ int estPieceDuJoueur(liste *l, char x, char y, char couleur){
 
 /* Test s'il n'y a plus de pièce de la couleur sur le plateau de jeu */
 int testVictoireAucunePiece(liste *l, char couleur){
-	noeud courant;
+	noeud *courant;
 	courant = l->first;
 	while(courant != NULL){
 		if(courant->p->couleur == couleur) return 0;
