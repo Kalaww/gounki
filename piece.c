@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "piece.h"
 
+/* Initialise la pièce */
 piece *initPiece(char x, char y, char couleur, type t){
 	piece *tmp = malloc(sizeof(piece));
 	tmp->x = x;
@@ -13,10 +14,12 @@ piece *initPiece(char x, char y, char couleur, type t){
 	return tmp;
 }
 
+/* Free pièce */
 void freePiece(piece *p){
 	free(p);
 }
 
+/* Test si deux pièce sont égales */
 int equalsPiece(piece *a, piece *b){
 	return 	a->x == b->x &&
 			a->y == b->y &&
@@ -24,12 +27,14 @@ int equalsPiece(piece *a, piece *b){
 			a->t == b->t;
 }
 
+/* Représentation en string de la pièce */
 char* strPiece(piece *p){
 	char *mot = malloc(sizeof(char)*7);
 	sprintf(mot, "(%c,%c)%c%d", p->x, p->y, p->couleur, p->t);
 	return mot;
 }
 
+/* Empile la pièce d'arrivée sur celle de départ */
 int empilementPiece(piece *depart, piece *arrivee){
 	if(depart->t == cccarre || depart->t == rrrond || arrivee->t == cccarre || arrivee->t == rrrond
 		|| ((depart->t == ccarre|| depart->t == rrond || depart->t == crond) && (arrivee->t == rrond || arrivee->t == ccarre || arrivee->t == crond))){
@@ -61,6 +66,7 @@ int empilementPiece(piece *depart, piece *arrivee){
 	return 1;
 }
 
+/* Empile la pièce d'arrivée avec la valeur donnée */
 int empilementUnique(piece *arrivee, type valeur){
 	if(arrivee->t == cccarre || arrivee->t == rrrond || arrivee->t == ccrond || arrivee->t == crrond) return 0;
 	if(valeur == rrrond || valeur == cccarre || valeur == ccrond || valeur == crrond || 

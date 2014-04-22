@@ -5,6 +5,7 @@
 
 /* LISTE PIECES */
 
+/* Initialise une liste de pièces */
 liste *initListe(){
 	liste *l = malloc(sizeof(liste));
 	l->length = 0;
@@ -12,22 +13,26 @@ liste *initListe(){
 	return l;
 }
 
+/* Free liste de pièces */
 void freeListe(liste *l){
 	if(l && l->first) freeNoeudRecursive(l->first);
 	free(l);
 }
 
+/* Free noeud de pièce */
 void freeNoeud(noeud *n){
 	if(!n) return;
 	freePiece(n->p);
 	free(n);
 }
 
+/* Free recursif de noeud de pièce */
 void freeNoeudRecursive(noeud *n){
 	if(n && n->next) freeNoeudRecursive(n->next);
 	freeNoeud(n);
 }
 
+/* Ajoute une pièce à la liste */
 void addListe(liste *l, piece *p){
 	noeud *n = malloc(sizeof(noeud));
 	n->p = p;
@@ -36,6 +41,7 @@ void addListe(liste *l, piece *p){
 	l->length++;
 }
 
+/*Enlève une pièce de la liste */
 void removeListe(liste *l, piece *p){
 	noeud *courant, *tmp;
 	if(l == NULL || l->first == NULL || l->length == 0) return;
@@ -58,6 +64,7 @@ void removeListe(liste *l, piece *p){
 	}
 }
 
+/* Récupère la pièce aux coordonnées x,y, NULL sinon */
 piece *getPieceByCoordListe(liste *l, char x, char y){
 	noeud *courant;
 	if(l == NULL || l->first == NULL || l->length == 0) return NULL;
@@ -69,6 +76,7 @@ piece *getPieceByCoordListe(liste *l, char x, char y){
 	return NULL;
 }
 
+/* Affiche la liste de pièces */
 void printListe(liste *l){
 	noeud* courant;
 	courant = l->first;
@@ -83,6 +91,7 @@ void printListe(liste *l){
 
 /*LISTE COORDS */
 
+/* Initialise une liste de coordonnées doubles */
 listeC *initListeC(){
 	listeC *l = malloc(sizeof(listeC));
 	l->length = 0;
@@ -90,22 +99,26 @@ listeC *initListeC(){
 	return l;
 }
 
+/* Free liste de coordonnées doubles */
 void freeListeC(listeC *l){
 	if(l && l->first) freeNoeudRecursiveC(l->first);
 	free(l);
 }
 
+/* Free noeud de coordonnées doubles */
 void freeNoeudC(noeudC *n){
 	if(!n) return;
 	free(n->c);
 	free(n);
 }
 
+/* Free noeud récursif de coordonnées doubles */
 void freeNoeudRecursiveC(noeudC *n){
 	if(n && n->next) freeNoeudRecursiveC(n->next);
 	freeNoeudC(n);
 }
 
+/* Ajoute une coordonnée double à la liste */
 void addListeC(listeC *l, coords *p){
 	noeudC *n = malloc(sizeof(noeudC));
 	n->c = p;
@@ -114,6 +127,7 @@ void addListeC(listeC *l, coords *p){
 	l->length++;
 }
 
+/* Enlève la coordonée double de la liste */
 void removeListeC(listeC *l, coords *p){
 	noeudC *courant, *tmp;
 	if(l == NULL || l->first == NULL || l->length == 0) return;
@@ -136,6 +150,7 @@ void removeListeC(listeC *l, coords *p){
 	}
 }
 
+/* Initialise une coordonnée double */
 coords *initCoords(char x1, char x, char y1, char y){
 	coords *tmp = malloc(sizeof(coords));
 	tmp->x = x;
@@ -150,6 +165,7 @@ coords *initCoords(char x1, char x, char y1, char y){
 	return tmp;
 }
 
+/* Initialise une coordonnée double ne contenant qu'une coordonnée */
 coords *initCoord(char x, char y){
 	coords *tmp = malloc(sizeof(coords));
 	tmp->x = x;
@@ -159,6 +175,7 @@ coords *initCoord(char x, char y){
 	return tmp;
 }
 
+/* Test égalité de deux coordonnées doubles */
 int equalsCoords(coords *a, coords *b){
 	return a->x == b->x && a->y == b->y && a->x1 == b->x1 && a->y1 == b->y1;
 }
@@ -166,6 +183,7 @@ int equalsCoords(coords *a, coords *b){
 
 /* LISTE COUPS */
 
+/* Initialise une liste de coups */
 listeH *initListeH(){
 	listeH *l = malloc(sizeof(listeH));
 	l->length = 0;
@@ -174,21 +192,25 @@ listeH *initListeH(){
 	return l;
 }
 
+/* Free liste de coups */
 void freeListeH(listeH *l){
 	if(l && l->first) freeNoeudRecursiveH(l->first);
 	free(l);
 }
 
+/* Free noeud d'un coups */
 void freeNoeudH(noeudH *n){
 	if(!n) return;
 	free(n);
 }
 
+/* Free récursif d'un noeud d'un coups */
 void freeNoeudRecursiveH(noeudH *n){
 	if(n && n->next) freeNoeudRecursiveH(n->next);
 	freeNoeudH(n);
 }
 
+/* Ajoute le coups à la liste */
 void addListeH(listeH *l, char *s){
 	noeudH *n = malloc(sizeof(noeudH));
 	strcpy(n->c, s);
@@ -199,6 +221,7 @@ void addListeH(listeH *l, char *s){
 	l->length++;
 }
 
+/* Enlève le coups de la liste */
 void removeListeH(listeH *l, char *p){
 	noeudH *courant, *tmp;
 	if(l == NULL || l->first == NULL || l->length == 0) return;
@@ -223,6 +246,7 @@ void removeListeH(listeH *l, char *p){
 	}
 }
 
+/* Affiche la liste de coups */
 void printListeH(listeH *l){
 	noeudH* courant;
 	courant = l->first;

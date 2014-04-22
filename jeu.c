@@ -4,6 +4,7 @@
 #include <string.h>
 #include "jeu.h"
 
+/* Initialise le jeu */
 jeu *initJeu(int blanc, int noir){
 	jeu *j = malloc(sizeof(jeu));
 	j->list = initListe();
@@ -18,6 +19,7 @@ jeu *initJeu(int blanc, int noir){
 	return j;
 }
 
+/* Free du jeu */
 void freeJeu(jeu *j){
 	if(j){
 		freeListe(j->list);
@@ -27,6 +29,7 @@ void freeJeu(jeu *j){
 	free(j);
 }
 
+/* Boucle du jeu */
 void startJeu(jeu *j){
 	char sortie = 0, x, y, a, b, a1, b1, a2, b2, commencePar, erreur = 1, *vide;
 	char nomSauvegarde[100];
@@ -147,6 +150,7 @@ void startJeu(jeu *j){
 	printf("Fermeture du jeu\n");
 }
 
+/* Test si la chaîne de caractère est un mouvement */
 int estMouvement(char input[], char couleur){
 	return strlen(input) == 5 
 		&& input[0] >= 'a' && input[0] <= 'h'
@@ -156,6 +160,7 @@ int estMouvement(char input[], char couleur){
 		&& ((couleur == 'n' && input[4] >= '0') || (input[4] >= '1')) && ((couleur == 'b' && input[5]  <= '9') || (input[5] <= '8'));
 }
 
+/* Test si la chaîne de caractère est un déploiement double */
 int estDeploiementDouble(char input[], char couleur){
 	return strlen(input) == 8 
 		&& input[0] >= 'a' && input[0] <= 'h'
@@ -168,6 +173,7 @@ int estDeploiementDouble(char input[], char couleur){
 		&& ((couleur == 'n' && input[7] >= '0') || (input[7] >= '1')) && ((couleur == 'b' && input[7]  <= '9') || (input[7] <= '8'));
 }
 
+/* Test si la chaîne de caractère est un déploiement triple */
 int estDeploiementTriple(char input[], char couleur){
 	return strlen(input) == 11 
 		&& input[0] >= 'a' && input[0] <= 'h'
@@ -183,6 +189,7 @@ int estDeploiementTriple(char input[], char couleur){
 		&& ((couleur == 'n' && input[10] >= '0') || (input[10] >= '1')) && ((couleur == 'b' && input[10]  <= '9') || (input[10] <= '8'));
 }
 
+/* Test si la pièce sur la case x,y est une pièce appartenant au joueur de la couleur donnée */
 int estPieceDuJoueur(liste *l, char x, char y, char couleur){
 	piece *p = getPieceByCoordListe(l, x, y);
 	if(p == NULL){
@@ -195,6 +202,18 @@ int estPieceDuJoueur(liste *l, char x, char y, char couleur){
 	return 1;
 }
 
+/* Test s'il n'y a plus de pièce de la couleur sur le plateau de jeu */
+int testVictoireAucunePiece(liste *l, char couleur){
+	noeud courant;
+	courant = l->first;
+	while(courant != NULL){
+		if(courant->p->couleur == couleur) return 0;
+		courant = courant->next;
+	}
+	return 1;
+}
+
+/* Rejoue l'historique des coups à partir de la configuration de départ */
 void jouerHistorique(jeu *j){
 	noeudH *courant;
 	noeud *starterC;
@@ -252,6 +271,7 @@ void jouerHistorique(jeu *j){
 	}
 }
 
+/* Charge un historique de coups situé dans le fichier en paramètre */
 void chargerFichierTest(jeu *j, char *nomFichier){
 	FILE *file;
 	char * ligne = NULL;
@@ -273,6 +293,7 @@ void chargerFichierTest(jeu *j, char *nomFichier){
 	fclose(file);
 }
 
+/* Sauvegarde un historique de coups dans le fichier en paramètre */
 void sauvegarderHistorique(jeu *j, char *nomFichier){
 	FILE *file;
 	noeudH *courant;
@@ -292,6 +313,7 @@ void sauvegarderHistorique(jeu *j, char *nomFichier){
 	fclose(file);
 }
 
+/* Charge une configuration de départ situé dans le fichier en paramètre */
 void chargerFichierPlateau(jeu *j, char *nomFichier){
 	FILE *file;
 	char *ligne = NULL, x, y;
@@ -362,6 +384,7 @@ void chargerFichierPlateau(jeu *j, char *nomFichier){
 	fclose(file);
 }
 
+/* Sauvegarde le plateau de jeu dans le fichier en paramètre */
 void sauvegarderPlateau(jeu *j, char *nomFichier){
 	FILE *file;
 	char x, y;
@@ -384,6 +407,7 @@ void sauvegarderPlateau(jeu *j, char *nomFichier){
 	fclose(file);
 }
 
+/* Initialise le plateau de jeu dans ca configuration classique */
 void initPlateau(liste *l){
 	char colonne;
 	int impair = carre, pair = rond;
@@ -401,6 +425,7 @@ void initPlateau(liste *l){
 	}
 }
 
+/* Affiche le plateau sur la sortie standard */
 void printPlateau(jeu *j){
 	char colonne, ligne;
 	piece *p;

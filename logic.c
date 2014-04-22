@@ -4,6 +4,7 @@
 
 /* DEPLECEMENT */
 
+/* Test si le déplacement est valide */
 int deplaValide(liste *l, char couleur, char x, char y, char a, char b){
 	piece *depart;
 	listeC *cases;
@@ -26,6 +27,7 @@ int deplaValide(liste *l, char couleur, char x, char y, char a, char b){
 	return 0;
 }
 
+/* Récupère une liste de coordonées des déplacements possibles de la pièce en x,y */
 listeC* deplaCasesPossibles(liste *l, type t, char couleur, char x, char y){
 	listeC *cases = initListeC();
 	int sens = (couleur == 'b')? 1 : -1;
@@ -153,11 +155,13 @@ listeC* deplaCasesPossibles(liste *l, type t, char couleur, char x, char y){
 	return cases;
 }
 
+/* Test si un déplacement est possible sur la case x,y */
 int deplaPossibleSurCase(liste *l, char couleur, char x, char y){
 	piece *tmp = getPieceByCoordListe(l, x, y);
 	return tmp == NULL || tmp->couleur != couleur || tmp->t == carre || tmp->t == rond || tmp->t == crond || tmp->t == ccarre || tmp->t == rrond;
 }
 
+/* Déplace la pièce x,y sur la case a,b */
 int deplaPiece(liste *l, char x, char y, char a, char b){
 	piece *depart, *arrivee, *tmp;
 	depart = getPieceByCoordListe(l, x, y);
@@ -186,6 +190,7 @@ int deplaPiece(liste *l, char x, char y, char a, char b){
 
 /* DEPLOIEMENT */
 
+/* Récupère une liste de coordonnées des déploiements possibles de la pièce en x, y */
 listeC *deploCasesPossibles(liste *l, type t, char couleur, char x, char y){
 	listeC *cases = initListeC();
 	int sens = (couleur == 'b')? 1 : -1;
@@ -451,6 +456,7 @@ listeC *deploCasesPossibles(liste *l, type t, char couleur, char x, char y){
 	return cases;
 }
 
+/* Test si le déploiement est valide */
 int deploValide(liste *l, char couleur, char commencePar, char x, char y, char a, char b, char a1, char b1){
 	piece *depart;
 	listeC *cases;
@@ -476,6 +482,7 @@ int deploValide(liste *l, char couleur, char commencePar, char x, char y, char a
 	return 0;
 }
 
+/* Déploie la pièce double x,y en a,b en passant par a1,b1 */
 int deploPieceDouble(liste *l, char couleur, char commencePar, char x, char y, char a, char b, char a1, char b1){
 	piece *depart;
 	char t;
@@ -500,6 +507,7 @@ int deploPieceDouble(liste *l, char couleur, char commencePar, char x, char y, c
 	return 1;
 }
 
+/* Déploie la pièce triple x,y en a,b en passant par a1,b1 et a2,b2 */
 int deploPieceTriple(liste *l, char couleur, char commencePar, char x, char y, char a, char b, char a1, char b1, char a2, char b2){
 	piece *depart;
 	char t;
@@ -543,23 +551,21 @@ int deploPieceTriple(liste *l, char couleur, char commencePar, char x, char y, c
 	return 1;
 }
 
+/* Déploie le type donnée sur la case x,y */
 void deploSurCase(liste *l, char couleur, char x, char y, type t){
 	piece *arrivee = getPieceByCoordListe(l, x, y);
 	if(arrivee == NULL) addListe(l, initPiece(x, y, couleur, t));
 	else empilementUnique(arrivee, t);
 }
 
+/* Test si un déploiement est possible sur la case x,y */
 int deploPossibleSurCase(liste *l, char couleur, char x, char y){
 	piece *tmp = getPieceByCoordListe(l, x, y);
 	return tmp == NULL || (tmp->couleur == couleur && (tmp->t == carre || tmp->t == rond || tmp->t == ccarre || tmp->t == rrond || tmp->t == crond));
 }
 
+/* Test si un déploiement double est possible sur la case x,y */
 int deploDoublePossibleSurCase(liste *l, char couleur, char x, char y){
 	piece *tmp = getPieceByCoordListe(l, x, y);
 	return tmp == NULL || (tmp->couleur == couleur && (tmp->t == carre || tmp->t == rond));
 }
-
-
-/* HISTORIQUE DES COUPS */
-
-
