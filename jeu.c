@@ -7,18 +7,21 @@
 jeu *initJeu(int blanc, int noir){
 	jeu *j = malloc(sizeof(jeu));
 	j->list = initListe();
+	j->starter = initListe();
 	j->joueur = 'b';
 	j->blanc = blanc;
 	j->noir = noir;
 	j->tour = 1;
 	j->coups = initListeH();
 	initPlateau(j->list);
+	initPlateau(j->starter);
 	return j;
 }
 
 void freeJeu(jeu *j){
 	if(j){
 		freeListe(j->list);
+		freeListe(j->starter);
 		freeListeH(j->coups);
 	}
 	free(j);
@@ -54,17 +57,20 @@ void startJeu(jeu *j){
 			}else if(strlen(input) == 1 && input[0] == 'h'){
 				printf("c : historique des coups\nr : annuler dernier coups\ns : sauvegarder l'historique des coups\nS : sauvegarder le plateau\nq : quitter\n");
 			}else if(strlen(input) == 1 && input[0] == 's'){
+				printf("[ATTENTION] Sauvegarder un historique de coups d'une configuration de départ personnalisée ne pourra être rejoué que avec cette configuration\n");
 				printf("Nom du fichier de sauvegarde ? ");
 				fgets(nomSauvegarde, sizeof(nomSauvegarde), stdin);
 				vide = strchr(nomSauvegarde, '\n');
 				if(vide) *vide = 0;
 				sauvegarderHistorique(j, nomSauvegarde);
+				printf("Sauvegarde terminée.\n");
 			}else if(strlen(input) == 1 && input[0] == 'S'){
 				printf("Nom du fichier de sauvegarde ? ");
 				fgets(nomSauvegarde, sizeof(nomSauvegarde), stdin);
 				vide = strchr(nomSauvegarde, '\n');
 				if(vide) *vide = 0;
 				sauvegarderPlateau(j, nomSauvegarde);
+				printf("Sauvegarde terminée.\n");
 			}else if(estMouvement(input, j->joueur)){
 				x = input[0];
 				y = input[1];
@@ -191,22 +197,43 @@ int estPieceDuJoueur(liste *l, char x, char y, char couleur){
 
 void jouerHistorique(jeu *j){
 	noeudH *courant;
+	noeud *starterC;
 	int victoire;
 	
 	freeListe(j->list);
 	j->list = initListe();
 	j->joueur = 'b';
 	j->tour = 1;
-	initPlateau(j->list);
+	
+	starterC = j->starter->first;
+	while(starterC != NULL){
+		addListe(j->list, initPiece(starterC->p->x, starterC->p->y, starterC->p->couleur, starterC->p->t));
+		starterC = starterC->next;
+	}
 	
 	courant = j->coups->first;
 	while(courant != NULL){
 		if(estMouvement(courant->c, j->joueur)){
-			victoire = deplaPiece(j->list, courant->c[0], courant->c[1], courant->c[3], courant->c[4]);
+			if(estPieceDuJoueur(j->list, courant->c[0], courant->c[1], j->joueur) && deplaValide(j->list, j->joueur, courant->c[0], courant->c[1], courant->c[3], courant->c[4])){
+				victoire = deplaPiece(j->list, courant->c[0], courant->c[1], courant->c[3], courant->c[4]);
+			}else{
+				printf("Erreur : mouvement impossible %s\n", courant->c);
+				exit(1);
+			}
 		}else if(estDeploiementDouble(courant->c, j->joueur)){
-			victoire = deploPieceDouble(j->list, j->joueur, courant->c[2], courant->c[0], courant->c[1], courant->c[6], courant->c[7], courant->c[3], courant->c[4]);
+			if(estPieceDuJoueur(j->list, courant->c[0], courant->c[1], j->joueur) && deploValide(j->list, j->joueur, courant->c[2], courant->c[0], courant->c[1], courant->c[6], courant->c[7], courant->c[3], courant->c[4])){
+				victoire = deploPieceDouble(j->list, j->joueur, courant->c[2], courant->c[0], courant->c[1], courant->c[6], courant->c[7], courant->c[3], courant->c[4]);
+			}else{
+				printf("Erreur : mouvement impossible %s\n", courant->c);
+				exit(1);
+			}
 		}else if(estDeploiementTriple(courant->c, j->joueur)){
-			victoire = deploPieceTriple(j->list, j->joueur, courant->c[2], courant->c[0], courant->c[1], courant->c[9], courant->c[10], courant->c[3], courant->c[4], courant->c[6], courant->c[7]);
+			if(estPieceDuJoueur(j->list, courant->c[0], courant->c[1], j->joueur) && deploValide(j->list, j->joueur, courant->c[2], courant->c[0], courant->c[1], courant->c[9], courant->c[10], courant->c[3], courant->c[4])){
+				victoire = deploPieceTriple(j->list, j->joueur, courant->c[2], courant->c[0], courant->c[1], courant->c[9], courant->c[10], courant->c[3], courant->c[4], courant->c[6], courant->c[7]);
+			}else{
+				printf("Erreur : mouvement impossible %s\n", courant->c);
+				exit(1);
+			}
 		}else{
 			printf("ERREUR : %s n'est pas un coups reconnu", courant->c);
 			exit(1);
@@ -272,7 +299,9 @@ void chargerFichierPlateau(jeu *j, char *nomFichier){
 	size_t len = 0;
 	
 	freeListe(j->list);
+	freeListe(j->starter);
 	j->list = initListe();
+	j->starter = initListe();
 	
 	file = fopen(nomFichier, "r");
 	if(file == NULL){
@@ -313,8 +342,10 @@ void chargerFichierPlateau(jeu *j, char *nomFichier){
 			}
 			if(ligne[0] == 'B'){
 				addListe(j->list, initPiece(x, y, 'b', t));
+				addListe(j->starter, initPiece(x, y, 'b', t));
 			}else if(ligne[0] == 'N'){
 				addListe(j->list, initPiece(x, y, 'n', t));
+				addListe(j->starter, initPiece(x, y, 'n', t));
 			}
 		}else{
 			printf("La ligne '%s' n'est pas au bon format\n", ligne);

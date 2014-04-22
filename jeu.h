@@ -6,6 +6,7 @@
 
 typedef struct jeu{
 	liste *list;
+	liste *starter;
 	char joueur;
 	int tour;
 	int blanc;

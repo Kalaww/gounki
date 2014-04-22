@@ -42,17 +42,12 @@ int main(int argc, char *argv[]){
 		}
 	}
 	
-	if(fichierCharger != NULL && fichierTest != NULL){
-		printf("Impossible de charger un plateau de jeu et un historique de coups en même temps (-c et -t)\n");
-		return 1;
-	}
-	
 	printf("B:%d N:%d\n", b, n);
 	printf("c: %s | t: %s\n", fichierCharger, fichierTest);
 	
 	j = initJeu(b, n);
-	if(fichierTest != NULL) chargerFichierTest(j, fichierTest);
 	if(fichierCharger != NULL) chargerFichierPlateau(j, fichierCharger);
+	if(fichierTest != NULL) chargerFichierTest(j, fichierTest);
 	startJeu(j);
 	freeJeu(j);
 	return 0;
