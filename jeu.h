@@ -25,5 +25,7 @@ void initPlateau(liste*);
 void printPlateau(jeu *);
 void chargerFichierTest(jeu*, char*);
 void sauvegarderHistorique(jeu*, char*);
+void chargerFichierPlateau(jeu*, char*);
+void sauvegarderPlateau(jeu*, char*);
 
 #endif

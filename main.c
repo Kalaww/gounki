@@ -52,6 +52,7 @@ int main(int argc, char *argv[]){
 	
 	j = initJeu(b, n);
 	if(fichierTest != NULL) chargerFichierTest(j, fichierTest);
+	if(fichierCharger != NULL) chargerFichierPlateau(j, fichierCharger);
 	startJeu(j);
 	freeJeu(j);
 	return 0;

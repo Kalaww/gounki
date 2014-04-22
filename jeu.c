@@ -52,13 +52,19 @@ void startJeu(jeu *j){
 				if(j->joueur == 'n') j->tour--;
 				erreur = 0;
 			}else if(strlen(input) == 1 && input[0] == 'h'){
-				printf("c : historique des coups\nr : annuler dernier coups\ns : sauvegarder l'historique des coups\nq : quitter\n");
+				printf("c : historique des coups\nr : annuler dernier coups\ns : sauvegarder l'historique des coups\nS : sauvegarder le plateau\nq : quitter\n");
 			}else if(strlen(input) == 1 && input[0] == 's'){
 				printf("Nom du fichier de sauvegarde ? ");
 				fgets(nomSauvegarde, sizeof(nomSauvegarde), stdin);
 				vide = strchr(nomSauvegarde, '\n');
 				if(vide) *vide = 0;
 				sauvegarderHistorique(j, nomSauvegarde);
+			}else if(strlen(input) == 1 && input[0] == 'S'){
+				printf("Nom du fichier de sauvegarde ? ");
+				fgets(nomSauvegarde, sizeof(nomSauvegarde), stdin);
+				vide = strchr(nomSauvegarde, '\n');
+				if(vide) *vide = 0;
+				sauvegarderPlateau(j, nomSauvegarde);
 			}else if(estMouvement(input, j->joueur)){
 				x = input[0];
 				y = input[1];
@@ -254,6 +260,94 @@ void sauvegarderHistorique(jeu *j, char *nomFichier){
 	while(courant != NULL){
 		fprintf(file, "%s\n", courant->c);
 		courant = courant->next;
+	}
+	
+	fclose(file);
+}
+
+void chargerFichierPlateau(jeu *j, char *nomFichier){
+	FILE *file;
+	char *ligne = NULL, x, y;
+	type t;
+	size_t len = 0;
+	
+	freeListe(j->list);
+	j->list = initListe();
+	
+	file = fopen(nomFichier, "r");
+	if(file == NULL){
+		printf("Impossible d'ouvrir le fichier\n");
+		exit(1);
+	}
+	
+	x = 'a';
+	y = '1';
+	while(getline(&ligne, &len, file) != -1){
+		ligne[strlen(ligne)-1] = '\0';
+		if(strlen(ligne) == 2){
+			switch(ligne[1]){
+				case '0':
+					t = vide; break;
+				case '1':
+					t = carre; break;
+				case '2':
+					t = rond; break;
+				case '3':
+					t = ccarre; break;
+				case '4':
+					t = rrond; break;
+				case '5':
+					t = cccarre; break;
+				case '6':
+					t = rrrond; break;
+				case '7':
+					t = crond; break;
+				case '8':
+					t = ccrond; break;
+				case '9':
+					t = crrond; break;
+				default:
+					printf("Aucune pièce correspond à %c\n", ligne[1]);
+					exit(1);
+					break;
+			}
+			if(ligne[0] == 'B'){
+				addListe(j->list, initPiece(x, y, 'b', t));
+			}else if(ligne[0] == 'N'){
+				addListe(j->list, initPiece(x, y, 'n', t));
+			}
+		}else{
+			printf("La ligne '%s' n'est pas au bon format\n", ligne);
+			exit(1);
+		}
+		
+		x++;
+		if(x > 'h'){
+			x = 'a';
+			y++;
+		}
+	}
+	
+	fclose(file);
+}
+
+void sauvegarderPlateau(jeu *j, char *nomFichier){
+	FILE *file;
+	char x, y;
+	piece *p;
+	
+	file = fopen(nomFichier, "w");
+	if(file == NULL){
+		printf("Impossible d'ouvrir le fichier\n");
+		return;
+	}
+	
+	for(y = '1'; y <= '8'; y++){
+		for(x = 'a'; x <= 'h'; x++){
+			p = getPieceByCoordListe(j->list, x, y);
+			if(p == NULL) fprintf(file, "V0\n");
+			else fprintf(file, "%c%d\n", ((p->couleur == 'b')? 'B':'N'), p->t);
+		}
 	}
 	
 	fclose(file);
