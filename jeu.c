@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "jeu.h"
 
 /* Initialise le jeu */
@@ -40,10 +41,17 @@ void startJeu(jeu *j){
 		erreur = 1;
 		coupsSucces = 0;
 		do{
-			printf("Quelle pièce souhaitez vous déplacer ? ");
-			fgets(input, sizeof(input), stdin);
-			vide = strchr(input, '\n');
-			if(vide) *vide = 0;
+			/* Tour IA */
+			if((j->joueur == 'b' && j->blanc > 1) || (j->joueur == 'n' && j->noir > 1)){
+				strcpy(input, jouerIA(j));
+			/* Tour humain */
+			}else{
+				printf("Quelle pièce souhaitez vous déplacer ? ");
+				fgets(input, sizeof(input), stdin);
+				vide = strchr(input, '\n');
+				if(vide) *vide = 0;
+			}
+			
 			if(strlen(input) == 1 && input[0] == 'q'){
 				erreur = 0;
 				sortie = 1;
@@ -141,7 +149,6 @@ void startJeu(jeu *j){
 		j->joueur = (j->joueur == 'b')? 'n' : 'b';
 		if(testVictoireAucunePiece(j->list, j->joueur) == 1) victoire = (j->joueur == 'b')? 3 : 2;
 		if(j->joueur == 'b') j->tour++;
-		printListeH(j->coups);
 	}
 	if(victoire > 1){
 		if(victoire == 2) printf("Victoire du joueur Blanc !\n");
@@ -452,3 +459,86 @@ void printPlateau(jeu *j){
 	}
 	printf("    -------------------------     h: liste des commandes\n");
 }
+
+/* Fait jouer l'IA selon sont niveau de difficulté */
+char* jouerIA(jeu *j){
+	char valeur;
+	valeur = (j->joueur == 'b')? j->blanc : j->noir;
+	if(valeur == 2) return randomIA(j);
+	return NULL;
+}
+
+/* Selectionne un coup à jouer aléatoirement */
+char* randomIA(jeu *j){
+	int r, i, cas = 0;
+	noeud *courant;
+	noeudC *courantC;
+	listeC *deplacement;
+	listeC *deploiement;
+	piece *p;
+	char *coup = malloc(sizeof(char)*20);
+	srand(time(NULL));
+	
+	while(cas == 0){
+		do{
+			r = rand() % j->list->length;
+			courant = j->list->first;
+			for(i = 0; i < r; i++) courant = courant->next;
+			p = courant->p;
+			if(p->couleur != j->joueur) p = NULL;
+		}while(p == NULL);
+		
+		coup[0] = p->x;
+		coup[1] = p->y;
+		
+		deplacement = deplaCasesPossibles(j->list, p->t, j->joueur, p->x, p->y);
+		deploiement = deploCasesPossibles(j->list, p->t, j->joueur, p->x, p->y);
+		
+		if(deplacement->length == 0 && deploiement->length == 0) cas = 0;
+		else if(deplacement->length > 0 && deploiement->length == 0) cas = 1;
+		else if(deplacement->length == 0 && deploiement->length > 0) cas = 2;
+		else{
+			r = rand() %2;
+			cas = r+1;
+		}
+		
+		if(cas == 1){
+			r = rand() % deplacement->length;
+			courantC = deplacement->first;
+			for(i = 0; i < r; i++) courantC = courantC->next;
+			coup[2] = '-';
+			coup[3] = courantC->c->x;
+			coup[4] = courantC->c->y;
+			coup[5] = '\0';
+			return coup;
+		}
+		
+		if(cas == 2){
+			r = rand() % deploiement->length;
+			courantC = deploiement->first;
+			for(i = 0; i < r; i++) courantC = courantC->next;
+			if(p->t == ccarre || p->t == cccarre || p->y == courantC->c->y1 || p->x == courantC->c->x1) coup[2] = '+';
+			else coup[2] = '*';
+			coup[3] = courantC->c->x1;
+			coup[4] = courantC->c->y1;
+			coup[5] = '-';
+			
+			if(p->t == ccarre || p->t == rrond || p->t == crond){
+				coup[6] = courantC->c->x;
+				coup[7] = courantC->c->y;
+				coup[8] = '\0';
+			}else{
+				coup[6] = courantC->c->x2;
+				coup[7] = courantC->c->y2;
+				coup[8] = '-';
+				coup[9] = courantC->c->x;
+				coup[10] = courantC->c->y;
+				coup[11] = '\0';
+			}
+			return coup;
+		}
+	}
+	return NULL;
+}
+
+

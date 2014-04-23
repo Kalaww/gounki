@@ -29,5 +29,7 @@ void chargerFichierTest(jeu*, char*);
 void sauvegarderHistorique(jeu*, char*);
 void chargerFichierPlateau(jeu*, char*);
 void sauvegarderPlateau(jeu*, char*);
+char* randomIA(jeu*);
+char* jouerIA(jeu*);
 
 #endif

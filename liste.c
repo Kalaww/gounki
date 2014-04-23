@@ -91,7 +91,7 @@ void printListe(liste *l){
 
 /*LISTE COORDS */
 
-/* Initialise une liste de coordonnées doubles */
+/* Initialise une liste de coordonnées triples */
 listeC *initListeC(){
 	listeC *l = malloc(sizeof(listeC));
 	l->length = 0;
@@ -99,26 +99,26 @@ listeC *initListeC(){
 	return l;
 }
 
-/* Free liste de coordonnées doubles */
+/* Free liste de coordonnées triples */
 void freeListeC(listeC *l){
 	if(l && l->first) freeNoeudRecursiveC(l->first);
 	free(l);
 }
 
-/* Free noeud de coordonnées doubles */
+/* Free noeud de coordonnées triples */
 void freeNoeudC(noeudC *n){
 	if(!n) return;
 	free(n->c);
 	free(n);
 }
 
-/* Free noeud récursif de coordonnées doubles */
+/* Free noeud récursif de coordonnées triples */
 void freeNoeudRecursiveC(noeudC *n){
 	if(n && n->next) freeNoeudRecursiveC(n->next);
 	freeNoeudC(n);
 }
 
-/* Ajoute une coordonnée double à la liste */
+/* Ajoute une coordonnée triple à la liste */
 void addListeC(listeC *l, coords *p){
 	noeudC *n = malloc(sizeof(noeudC));
 	n->c = p;
@@ -127,7 +127,7 @@ void addListeC(listeC *l, coords *p){
 	l->length++;
 }
 
-/* Enlève la coordonée double de la liste */
+/* Enlève la coordonée triple de la liste */
 void removeListeC(listeC *l, coords *p){
 	noeudC *courant, *tmp;
 	if(l == NULL || l->first == NULL || l->length == 0) return;
@@ -150,7 +150,28 @@ void removeListeC(listeC *l, coords *p){
 	}
 }
 
-/* Initialise une coordonnée double */
+/* Initialise une coordonnée triple ne contenant que deux coordonnées */
+coords *initCoordss(char x1, char x2, char x, char y1, char y2, char y){
+	coords *tmp = malloc(sizeof(coords));
+	tmp->x = x;
+	if(y > '9') tmp->y = '9';
+	else if(y < '0') tmp->y = '0';
+	else tmp->y = y;
+	
+	tmp->x1 = x1;
+	if(y1 > '9') tmp->y1 = '9';
+	else if(y1 < '0') tmp->y1 = '0';
+	else tmp->y1 = y1;
+	
+	tmp->x2 = x2;
+	if(y2 > '9') tmp->y2 = '9';
+	else if(y2 < '0') tmp->y2 = '0';
+	else tmp->y2 = y2;
+	
+	return tmp;
+}
+
+/* Initialise une coordonnée triple ne contenant que deux coordonnées */
 coords *initCoords(char x1, char x, char y1, char y){
 	coords *tmp = malloc(sizeof(coords));
 	tmp->x = x;
@@ -162,22 +183,40 @@ coords *initCoords(char x1, char x, char y1, char y){
 	if(y1 > '9') tmp->y1 = '9';
 	else if(y1 < '0') tmp->y1 = '0';
 	else tmp->y1 = y1;
+	
+	tmp->x2 = 0;
+	tmp->y2 = 0;
 	return tmp;
 }
 
-/* Initialise une coordonnée double ne contenant qu'une coordonnée */
+/* Initialise une coordonnée triple ne contenant qu'une coordonnée */
 coords *initCoord(char x, char y){
 	coords *tmp = malloc(sizeof(coords));
 	tmp->x = x;
 	if(y > '9') tmp->y = '9';
 	else if(y < '0') tmp->y = '0';
 	else tmp->y = y;
+	tmp->x1 = 0;
+	tmp->x2 = 0;
+	tmp->y1 = 0;
+	tmp->y2 = 0;
 	return tmp;
 }
 
-/* Test égalité de deux coordonnées doubles */
+/* Test égalité de deux coordonnées triples */
 int equalsCoords(coords *a, coords *b){
-	return a->x == b->x && a->y == b->y && a->x1 == b->x1 && a->y1 == b->y1;
+	return a->x == b->x && a->y == b->y && a->x1 == b->x1 && a->y1 == b->y1 && a->x2 == b->x2 && a->y2 == b->y2;
+}
+
+/* Affiche la liste de coordonnées triples */
+void printListeC(listeC *l){
+	noeudC* courant;
+	courant = l->first;
+	while(courant != NULL){
+		printf("[(%c,%c)(%c,%c)(%c,%c)]", courant->c->x1, courant->c->y1, courant->c->x2, courant->c->y2, courant->c->x, courant->c->y);
+		courant = courant->next;
+	}
+	printf("\n");
 }
 
 

@@ -7,6 +7,8 @@ typedef struct coords{
 	char y;
 	char x1;
 	char y1;
+	char x2;
+	char y2;
 } coords;
 
 typedef struct noeud{
@@ -55,8 +57,10 @@ void freeNoeudC(noeudC*);
 void freeNoeudRecursiveC(noeudC*);
 void addListeC(listeC*, coords*);
 void removeListeC(listeC*, coords*);
+void printListeC(listeC*);
 
 int equalsCoords(coords*, coords*);
+coords *initCoordss(char, char, char, char, char, char);
 coords *initCoords(char, char, char, char);
 coords *initCoord(char, char);
 
