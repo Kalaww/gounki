@@ -66,7 +66,7 @@ void startJeu(jeu *j){
 				if(j->joueur == 'n') j->tour--;
 				erreur = 0;
 			}else if(strlen(input) == 1 && input[0] == 'h'){
-				printf("c : historique des coups\nr : annuler dernier coups\ns : sauvegarder l'historique des coups\nS : sauvegarder le plateau\nq : quitter\n");
+				printf("c : historique des coups\nr : annuler dernier coups\ns : sauvegarder l'historique des coups\np : sauvegarder le plateau\nq : quitter\n");
 			}else if(strlen(input) == 1 && input[0] == 's'){
 				printf("[ATTENTION] Sauvegarder un historique de coups d'une configuration de départ personnalisée ne pourra être rejoué que avec cette configuration\n");
 				printf("Nom du fichier de sauvegarde ? ");
@@ -75,7 +75,7 @@ void startJeu(jeu *j){
 				if(vide) *vide = 0;
 				sauvegarderHistorique(j, nomSauvegarde);
 				printf("Sauvegarde terminée.\n");
-			}else if(strlen(input) == 1 && input[0] == 'S'){
+			}else if(strlen(input) == 1 && input[0] == 'p'){
 				printf("Nom du fichier de sauvegarde ? ");
 				fgets(nomSauvegarde, sizeof(nomSauvegarde), stdin);
 				vide = strchr(nomSauvegarde, '\n');
@@ -438,7 +438,7 @@ void printPlateau(jeu *j){
 	char colonne, ligne;
 	piece *p;
 	printf("     a  b  c  d  e  f  g  h\n");
-	printf("    -------------------------\n");
+	printf("    -------------------------     TOUR %d (%s)\n", j->tour, (j->joueur == 'b')? "blanc" : "noir");
 	for(ligne = '8'; ligne >= '1'; ligne--){
 		printf(" %c | ", ligne);
 		for(colonne = 'a'; colonne <= 'h'; colonne++){
@@ -449,15 +449,15 @@ void printPlateau(jeu *j){
 				printf(" . ");
 		}
 		printf("|");
-		if(ligne == '8') printf("    1: c    2: r");
-		if(ligne == '7') printf("    3: cc   4: rr");
-		if(ligne == '6') printf("    5: ccc  6: rrr");
-		if(ligne == '5') printf("    7: cr   8: ccr");
-		if(ligne == '4') printf("    9: crr");
-		if(ligne == '2') printf("    TOUR %d (%s)", j->tour, (j->joueur == 'b')? "blanc" : "noir");
+		if(ligne == '7') printf("    1: c    2: r");
+		if(ligne == '6') printf("    3: cc   4: rr");
+		if(ligne == '5') printf("    5: ccc  6: rrr");
+		if(ligne == '4') printf("    7: cr   8: ccr");
+		if(ligne == '3') printf("    9: crr");
+		if(ligne == '1') printf("    h: liste des commandes");
 		printf("\n");
 	}
-	printf("    -------------------------     h: liste des commandes\n");
+	printf("    -------------------------\n");
 }
 
 /* Fait jouer l'IA selon sont niveau de difficulté */

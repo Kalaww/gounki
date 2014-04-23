@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "logic.h"
 
-/* DEPLECEMENT */
+/* DEPLACEMENT */
 
 /* Test si le déplacement est valide */
 int deplaValide(liste *l, char couleur, char x, char y, char a, char b){
