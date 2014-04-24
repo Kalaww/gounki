@@ -31,5 +31,6 @@ void chargerFichierPlateau(jeu*, char*);
 void sauvegarderPlateau(jeu*, char*);
 char* randomIA(jeu*);
 char* jouerIA(jeu*);
+int evaluationPlateau(jeu*);
 
 #endif

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <limits.h>
 #include "jeu.h"
 
 /* Initialise le jeu */
@@ -62,11 +63,10 @@ void startJeu(jeu *j){
 				printf("Annulation du dernier coups joué\n");
 				removeListeH(j->coups, j->coups->last->c);
 				jouerHistorique(j);
-				j->joueur = (j->joueur = 'b')? 'n' : 'b';
-				if(j->joueur == 'n') j->tour--;
+				j->joueur = (j->joueur == 'b')? 'n' : 'b';
 				erreur = 0;
 			}else if(strlen(input) == 1 && input[0] == 'h'){
-				printf("c : historique des coups\nr : annuler dernier coups\ns : sauvegarder l'historique des coups\np : sauvegarder le plateau\nq : quitter\n");
+				printf("v: heuristique du dernier coups\nc : historique des coups\nr : annuler dernier coups\ns : sauvegarder l'historique des coups\np : sauvegarder le plateau\nq : quitter\n");
 			}else if(strlen(input) == 1 && input[0] == 's'){
 				printf("[ATTENTION] Sauvegarder un historique de coups d'une configuration de départ personnalisée ne pourra être rejoué que avec cette configuration\n");
 				printf("Nom du fichier de sauvegarde ? ");
@@ -82,6 +82,8 @@ void startJeu(jeu *j){
 				if(vide) *vide = 0;
 				sauvegarderPlateau(j, nomSauvegarde);
 				printf("Sauvegarde terminée.\n");
+			}else if(strlen(input) == 1 && input[0] == 'v'){
+				printf("Heuristique du dernier coup : %d\n", evaluationPlateau(j));
 			}else if(estMouvement(input, j->joueur)){
 				x = input[0];
 				y = input[1];
@@ -148,7 +150,6 @@ void startJeu(jeu *j){
 		if(coupsSucces) addListeH(j->coups, input);
 		j->joueur = (j->joueur == 'b')? 'n' : 'b';
 		if(testVictoireAucunePiece(j->list, j->joueur) == 1) victoire = (j->joueur == 'b')? 3 : 2;
-		if(j->joueur == 'b') j->tour++;
 	}
 	if(victoire > 1){
 		if(victoire == 2) printf("Victoire du joueur Blanc !\n");
@@ -438,7 +439,7 @@ void printPlateau(jeu *j){
 	char colonne, ligne;
 	piece *p;
 	printf("     a  b  c  d  e  f  g  h\n");
-	printf("    -------------------------     TOUR %d (%s)\n", j->tour, (j->joueur == 'b')? "blanc" : "noir");
+	printf("    -------------------------     TOUR %d (%s)\n", j->coups->length/2+1, (j->joueur == 'b')? "blanc" : "noir");
 	for(ligne = '8'; ligne >= '1'; ligne--){
 		printf(" %c | ", ligne);
 		for(colonne = 'a'; colonne <= 'h'; colonne++){
@@ -541,4 +542,41 @@ char* randomIA(jeu *j){
 	return NULL;
 }
 
-
+int evaluationPlateau(jeu *j){
+	int valeur = 0;
+	noeud *courant;
+	
+	courant = j->list->first;
+	while(courant != NULL){
+		if(courant->p->couleur == j->joueur){
+			/* test victoire */
+			if((courant->p->couleur == 'b' && courant->p->y == '9') || (courant->p->couleur == 'n' && courant->p->y == '0')){
+				valeur = INT_MAX;
+				return valeur;
+			}
+			
+			/* valeur piece */
+			switch(courant->p->t){
+				case carre:
+				case rond:
+					valeur += 1; break;
+				case ccarre:
+				case rrond:
+				case crond:
+					valeur += 4; break;
+				case cccarre:
+				case rrrond:
+					valeur += 16; break;
+				case ccrond:
+				case crrond:
+					valeur += 32; break;
+				case vide:
+				default:
+					break;
+			}
+		}
+		courant = courant->next;
+	}
+	
+	return valeur;
+}
