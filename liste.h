@@ -71,5 +71,6 @@ void freeNoeudRecursiveH(noeudH*);
 void addListeH(listeH*, char*);
 void removeListeH(listeH*, char*);
 void printListeH(listeH*);
+void removeLastH(listeH*);
 
 #endif

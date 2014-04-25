@@ -285,6 +285,29 @@ void removeListeH(listeH *l, char *p){
 	}
 }
 
+void removeLastH(listeH *l){
+	noeudH *courant, *tmp;
+	courant = l->first;
+	if(courant == l->last){
+		l->first = NULL;
+		l->last = NULL;
+		l->length = 0;
+		freeNoeudH(courant);
+		return;
+	}
+	while(courant->next != NULL){
+		if(courant->next == l->last){
+			tmp = courant->next;
+			courant->next = NULL;
+			l->last = courant;
+			freeNoeudH(tmp);
+			l->length--;
+			return;
+		}
+		courant = courant->next;
+	}
+}
+
 /* Affiche la liste de coups */
 void printListeH(listeH *l){
 	noeudH* courant;
