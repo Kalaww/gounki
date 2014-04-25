@@ -244,7 +244,7 @@ listeC *deploCasesPossibles(liste *l, type t, char couleur, char x, char y){
 		
 		if(x < 'h' && deploPossibleSurCase(l, couleur, x+1, y)){
 			if(x < 'g' && deploPossibleSurCase(l, couleur, x, y+sens)) addListeC(cases, initCoords(x+1, x, y, y+sens));
-			if(deploPossibleSurCase(l, couleur, x+2, y+sens)) addListeC(cases, initCoords(x+2, x, y, y+sens));
+			if(deploPossibleSurCase(l, couleur, x+2, y+sens)) addListeC(cases, initCoords(x+1, x, y, y+sens));
 		}
 		
 		if(deploPossibleSurCase(l, couleur, x, y+sens)){

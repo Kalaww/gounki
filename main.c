@@ -15,6 +15,7 @@ int main(int argc, char *argv[]){
 			if(strcmp(argv[i+1], "h") == 0) b = 1;
 			else if(strcmp(argv[i+1], "r1") == 0) b = 2;
 			else if(strcmp(argv[i+1], "r2") == 0) b = 3;
+			else if(strcmp(argv[i+1], "r3") == 0) b = 4;
 			else return 1;
 			i++;
 		}
@@ -25,6 +26,7 @@ int main(int argc, char *argv[]){
 			if(strcmp(argv[i+1], "h") == 0) n = 1;
 			else if(strcmp(argv[i+1], "r1") == 0) n = 2;
 			else if(strcmp(argv[i+1], "r2") == 0) n = 3;
+			else if(strcmp(argv[i+1], "r3") == 0) n = 4;
 			else return 1;
 			i++;
 		}

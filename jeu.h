@@ -33,5 +33,8 @@ char* randomIA(jeu*);
 char* jouerIA(jeu*);
 int evaluationPlateau(jeu*);
 char* meilleurCoups(jeu*);
+int minimaxMax(jeu*, int);
+int minimaxMin(jeu*, int);
+char* minimaxIA(jeu*, int);
 
 #endif
