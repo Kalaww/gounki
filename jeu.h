@@ -32,5 +32,6 @@ void sauvegarderPlateau(jeu*, char*);
 char* randomIA(jeu*);
 char* jouerIA(jeu*);
 int evaluationPlateau(jeu*);
+char* meilleurCoups(jeu*);
 
 #endif

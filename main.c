@@ -13,7 +13,8 @@ int main(int argc, char *argv[]){
 		if(strlen(argv[i]) == 2 && strcmp(argv[i], "-b") == 0){
 			if(i+1 >= argc || strlen(argv[i+1]) == 0 || argv[i+1][0] == '-') return 1;
 			if(strcmp(argv[i+1], "h") == 0) b = 1;
-			else if(strcmp(argv[i+1], "r") == 0) b = 2;
+			else if(strcmp(argv[i+1], "r1") == 0) b = 2;
+			else if(strcmp(argv[i+1], "r2") == 0) b = 3;
 			else return 1;
 			i++;
 		}
@@ -22,7 +23,8 @@ int main(int argc, char *argv[]){
 		if(strlen(argv[i]) == 2 && strcmp(argv[i], "-n") == 0){
 			if(i+1 >= argc || strlen(argv[i+1]) == 0 || argv[i+1][0] == '-') return 1;
 			if(strcmp(argv[i+1], "h") == 0) n = 1;
-			else if(strcmp(argv[i+1], "r") == 0) n = 2;
+			else if(strcmp(argv[i+1], "r1") == 0) n = 2;
+			else if(strcmp(argv[i+1], "r2") == 0) n = 3;
 			else return 1;
 			i++;
 		}
