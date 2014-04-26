@@ -61,12 +61,15 @@ void startJeu(jeu *j){
 				printListeH(j->coups);
 			}else if(strlen(input) == 1 && input[0] == 'r'){
 				printf("Annulation du dernier coups joué\n");
+				if((j->joueur == 'n' && j->blanc > 1) || (j->joueur == 'b' && j->noir >1)){
+					removeLastH(j->coups);
+				}
 				removeLastH(j->coups);
 				jouerHistorique(j);
 				j->joueur = (j->joueur == 'b')? 'n' : 'b';
 				erreur = 0;
 			}else if(strlen(input) == 1 && input[0] == 'h'){
-				printf("v: heuristique du dernier coups\nc : historique des coups\nr : annuler dernier coups\ns : sauvegarder l'historique des coups\np : sauvegarder le plateau\nq : quitter\n");
+				printf("v : heuristique du dernier coups\nc : historique des coups\nr : annuler dernier coups\ns : sauvegarder l'historique des coups\np : sauvegarder le plateau\nq : quitter\n");
 			}else if(strlen(input) == 1 && input[0] == 's'){
 				printf("[ATTENTION] Sauvegarder un historique de coups d'une configuration de départ personnalisée ne pourra être rejoué que avec cette configuration\n");
 				printf("Nom du fichier de sauvegarde ? ");
@@ -83,7 +86,7 @@ void startJeu(jeu *j){
 				sauvegarderPlateau(j, nomSauvegarde);
 				printf("Sauvegarde terminée.\n");
 			}else if(strlen(input) == 1 && input[0] == 'v'){
-				printf("Heuristique du dernier coup : %d\n", evaluationPlateau(j));
+				printf("Heuristique courante : %d\n", evaluationPlateau(j, j->joueur));
 			}else if(estMouvement(input, j->joueur)){
 				x = input[0];
 				y = input[1];
@@ -269,9 +272,6 @@ void jouerHistorique(jeu *j){
 		}
 		
 		if(victoire > 1){
-			if(victoire == 2) printf("Victoire du joueur Blanc !\n");
-			else if(victoire == 3) printf("Victoire du joueur Noir !\n");
-			else printf("Le jeu s'est terminé sans victoire.\n");
 			return;
 		}
 		
@@ -421,14 +421,14 @@ void sauvegarderPlateau(jeu *j, char *nomFichier){
 void initPlateau(liste *l){
 	char colonne;
 	int impair = carre, pair = rond;
-	for(colonne = 'a'; colonne <= 'b'; colonne++){
+	for(colonne = 'a'; colonne <= 'h'; colonne++){
 		piece *p1 = initPiece(colonne, '1', 'b', impair);
 		piece *p2 = initPiece(colonne, '2', 'b', pair);
 		piece *p3 = initPiece(colonne, '7', 'n', impair);
 		piece *p4 = initPiece(colonne, '8', 'n', pair);
-		/*addListe(l, p1);*/
+		addListe(l, p1);
 		addListe(l, p2);
-		/*addListe(l, p3);*/
+		addListe(l, p3);
 		addListe(l, p4);
 		impair = (impair == carre)? rond : carre;
 		pair = (pair == carre)? rond : carre;
@@ -468,7 +468,7 @@ char* jouerIA(jeu *j){
 	valeur = (j->joueur == 'b')? j->blanc : j->noir;
 	if(valeur == 2) return randomIA(j);
 	else if(valeur == 3) return meilleurCoups(j);
-	else if(valeur == 4) return minimaxIA(j, 4);
+	else if(valeur == 4) return minimaxIA(j, 2);
 	return NULL;
 }
 
@@ -546,13 +546,13 @@ char* randomIA(jeu *j){
 }
 
 /* Heuristique */
-int evaluationPlateau(jeu *j){
+int evaluationPlateau(jeu *j, char couleur){
 	int valeur = 0;
 	noeud *courant;
 	
 	courant = j->list->first;
 	while(courant != NULL){
-		if(courant->p->couleur == j->joueur){
+		if(courant->p->couleur == couleur){
 			/* test victoire */
 			if((courant->p->couleur == 'b' && courant->p->y == '9') || (courant->p->couleur == 'n' && courant->p->y == '0')){
 				valeur = INT_MAX;
@@ -567,13 +567,45 @@ int evaluationPlateau(jeu *j){
 				case ccarre:
 				case rrond:
 				case crond:
-					valeur += 4; break;
+					valeur += 8; break;
 				case cccarre:
 				case rrrond:
-					valeur += 16; break;
+					valeur += 64; break;
 				case ccrond:
 				case crrond:
-					valeur += 32; break;
+					valeur += 128; break;
+				case vide:
+				default:
+					break;
+			}
+			
+			/* Valeur avancée */
+			if(couleur == 'b')
+				valeur += courant->p->y - '1'; 
+			else
+				valeur += '8' - courant->p->y;
+		}
+		courant = courant->next;
+	}
+	
+	/* Pieces adversaires */
+	while(courant != NULL){
+		if(courant->p->couleur != couleur){
+			/* valeur piece */
+			switch(courant->p->t){
+				case carre:
+				case rond:
+					valeur -= 1; break;
+				case ccarre:
+				case rrond:
+				case crond:
+					valeur -= 16; break;
+				case cccarre:
+				case rrrond:
+					valeur -= 128; break;
+				case ccrond:
+				case crrond:
+					valeur -= 256; break;
 				case vide:
 				default:
 					break;
@@ -624,7 +656,7 @@ char* meilleurCoups(jeu *j){
 				coupsTmp[3] = courantDepla->c->x;
 				coupsTmp[4] = courantDepla->c->y;
 				coupsTmp[5] = 0;
-				tmp = evaluationPlateau(j);
+				tmp = evaluationPlateau(j, j->joueur);
 				printf("COUPS [%s] = %d\n", coupsTmp, tmp);
 				if(tmp > valeurMax){
 					valeurMax = tmp;
@@ -657,7 +689,7 @@ char* meilleurCoups(jeu *j){
 					coupsTmp[6] = courantDeplo->c->x;
 					coupsTmp[7] = courantDeplo->c->y;
 					coupsTmp[8] = 0;
-					tmp = evaluationPlateau(j);
+					tmp = evaluationPlateau(j, j->joueur);
 					printf("COUPS [%s] = %d\n", coupsTmp, tmp);
 					if(tmp > valeurMax){
 						valeurMax = tmp;
@@ -687,7 +719,7 @@ char* meilleurCoups(jeu *j){
 					coupsTmp[9] = courantDeplo->c->x;
 					coupsTmp[10] = courantDeplo->c->y;
 					coupsTmp[11] = 0;
-					tmp = evaluationPlateau(j);
+					tmp = evaluationPlateau(j, j->joueur);
 					printf("COUPS [%s] = %d\n", coupsTmp, tmp);
 					if(tmp > valeurMax){
 						valeurMax = tmp;
@@ -709,7 +741,7 @@ char* meilleurCoups(jeu *j){
 }
 
 /* Minimax */
-int minimaxMax(jeu *j, int profondeur){
+int minimaxMax(jeu *j, int profondeur, int profondeurMax, char couleur){
 	char *coups, commencePar, *coupsTmp;
 	int valeurMax = INT_MIN, tmp, i;
 	listeC *coordCouleur;
@@ -720,11 +752,10 @@ int minimaxMax(jeu *j, int profondeur){
 	piece *tmpPiece;
 	
 	if(j->coups->last->c[strlen(j->coups->last->c)-2] == '0' || j->coups->last->c[strlen(j->coups->last->c)-2] == '9' || testVictoireAucunePiece(j->list, j->joueur)){
-		valeurMax = INT_MAX;
-		printf("VICT\n");
+		valeurMax = INT_MAX/(profondeur +1);
 		return valeurMax;
-	}else if(profondeur == 0){
-		return evaluationPlateau(j);
+	}else if(profondeur == profondeurMax){
+		return evaluationPlateau(j, couleur);
 	}
 	
 	coups = malloc(sizeof(char)*20);
@@ -756,14 +787,9 @@ int minimaxMax(jeu *j, int profondeur){
 				coupsTmp[4] = courantDepla->c->y;
 				coupsTmp[5] = 0;
 			}
-			for(i = 0; i < profondeur; i++) printf(">");
-			printf("COUPS [%s]\n", coupsTmp);
 			addListeH(j->coups, coupsTmp);
 			j->joueur = (j->joueur == 'b')? 'n':'b';
-			tmp = minimaxMin(j, profondeur-1);
-			for(i = 0; i < profondeur; i++) printf(">");
-			printf("VALEUR %d\n", tmp);
-			printListeH(j->coups);
+			tmp = minimaxMin(j, profondeur+1, profondeurMax, couleur);
 			
 			if(tmp > valeurMax){
 				valeurMax = tmp;
@@ -817,14 +843,9 @@ int minimaxMax(jeu *j, int profondeur){
 				}
 			}
 			
-			for(i = 0; i < profondeur; i++) printf(">");
-			printf("COUPS [%s]\n", coupsTmp);
 			addListeH(j->coups, coupsTmp);
 			j->joueur = (j->joueur == 'b')? 'n':'b';
-			tmp = minimaxMin(j, profondeur-1);
-			for(i = 0; i < profondeur; i++) printf(">");
-			printf("VALEUR %d\n", tmp);
-			printListeH(j->coups);
+			tmp = minimaxMin(j, profondeur+1, profondeurMax, couleur);
 			
 			if(tmp > valeurMax){
 				valeurMax = tmp;
@@ -843,7 +864,7 @@ int minimaxMax(jeu *j, int profondeur){
 }
 
 /* Minimax */
-int minimaxMin(jeu *j, int profondeur){
+int minimaxMin(jeu *j, int profondeur, int profondeurMax, char couleur){
 	char *coups, commencePar, *coupsTmp;
 	int valeurMax = INT_MAX, tmp, i;
 	listeC *coordCouleur;
@@ -854,11 +875,10 @@ int minimaxMin(jeu *j, int profondeur){
 	piece *tmpPiece;
 	
 	if(j->coups->last->c[strlen(j->coups->last->c)-2] == '0' || j->coups->last->c[strlen(j->coups->last->c)-2] == '9' || testVictoireAucunePiece(j->list, j->joueur)){
-		valeurMax = INT_MIN;
-		printf("VICT\n");
+		valeurMax = INT_MIN/(profondeur +1);
 		return valeurMax;
-	}else if(profondeur == 0){
-		return evaluationPlateau(j);
+	}else if(profondeur == profondeurMax){
+		return evaluationPlateau(j, couleur);
 	}
 	
 	coups = malloc(sizeof(char)*20);
@@ -890,14 +910,10 @@ int minimaxMin(jeu *j, int profondeur){
 				coupsTmp[4] = courantDepla->c->y;
 				coupsTmp[5] = 0;
 			}
-			for(i = 0; i < profondeur; i++) printf(">");
-			printf("COUPS [%s]\n", coupsTmp);
+			
 			addListeH(j->coups, coupsTmp);
 			j->joueur = (j->joueur == 'b')? 'n':'b';
-			tmp = minimaxMax(j, profondeur-1);
-			for(i = 0; i < profondeur; i++) printf(">");
-			printf("VALEUR %d\n", tmp);
-			printListeH(j->coups);
+			tmp = minimaxMax(j, profondeur+1, profondeurMax, couleur);
 			
 			if(tmp < valeurMax){
 				valeurMax = tmp;
@@ -951,14 +967,9 @@ int minimaxMin(jeu *j, int profondeur){
 				}
 			}
 			
-			for(i = 0; i < profondeur; i++) printf(">");
-			printf("COUPS [%s]\n", coupsTmp);
 			addListeH(j->coups, coupsTmp);
 			j->joueur = (j->joueur == 'b')? 'n':'b';
-			tmp = minimaxMax(j, profondeur-1);
-			for(i = 0; i < profondeur; i++) printf(">");
-			printf("VALEUR %d\n", tmp);
-			printListeH(j->coups);
+			tmp = minimaxMax(j, profondeur+1, profondeurMax, couleur);
 			
 			if(tmp < valeurMax){
 				valeurMax = tmp;
@@ -1016,11 +1027,9 @@ char* minimaxIA(jeu *j, int profondeur){
 				coupsTmp[4] = courantDepla->c->y;
 				coupsTmp[5] = 0;
 			}
-			printf("COUPS [%s]\n", coupsTmp);
 			addListeH(j->coups, coupsTmp);
 			j->joueur = (j->joueur == 'b')? 'n':'b';
-			tmp = minimaxMin(j, profondeur);
-			printf("VALEUR %d\n", tmp);
+			tmp = minimaxMin(j, 0, profondeur, (j->joueur == 'b')? 'n':'b');
 			
 			if(tmp > valeurMax){
 				valeurMax = tmp;
@@ -1074,11 +1083,10 @@ char* minimaxIA(jeu *j, int profondeur){
 					coupsTmp[11] = 0;
 				}
 			}
-			printf("COUPS [%s]\n", coupsTmp);
+			
 			addListeH(j->coups, coupsTmp);
 			j->joueur = (j->joueur == 'b')? 'n':'b';
-			tmp = minimaxMin(j, profondeur);
-			printf("VALEUR %d\n", tmp);
+			tmp = minimaxMin(j, 0, profondeur, (j->joueur == 'b')? 'n':'b');
 			
 			if(tmp > valeurMax){
 				valeurMax = tmp;
@@ -1094,6 +1102,7 @@ char* minimaxIA(jeu *j, int profondeur){
 		coordC = coordC->next;
 	}
 	printf("VALEUR FINAL : %d\n", valeurMax);
+	printListeH(j->coups);
 	return coups;
 }
 

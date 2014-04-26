@@ -31,10 +31,10 @@ void chargerFichierPlateau(jeu*, char*);
 void sauvegarderPlateau(jeu*, char*);
 char* randomIA(jeu*);
 char* jouerIA(jeu*);
-int evaluationPlateau(jeu*);
+int evaluationPlateau(jeu*, char);
 char* meilleurCoups(jeu*);
-int minimaxMax(jeu*, int);
-int minimaxMin(jeu*, int);
+int minimaxMax(jeu*, int, int, char);
+int minimaxMin(jeu*, int, int, char);
 char* minimaxIA(jeu*, int);
 
 #endif
