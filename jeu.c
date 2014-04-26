@@ -33,13 +33,13 @@ void freeJeu(jeu *j){
 
 /* Boucle du jeu */
 void startJeu(jeu *j){
-	char sortie = 0, x, y, a, b, a1, b1, a2, b2, commencePar, erreur = 1, *vide;
+	char sortie = 0, x, y, a, b, a1, b1, a2, b2, commencePar, *vide;
 	char nomSauvegarde[100];
 	char input[20];
-	int victoire = 0, coupsSucces = 0;
+	int victoire = 0, coupsSucces = 0, tourSucces = 0;
 	while(sortie != 1 && victoire < 2){
 		printPlateau(j);
-		erreur = 1;
+		tourSucces = 0;
 		coupsSucces = 0;
 		do{
 			/* Tour IA */
@@ -54,7 +54,7 @@ void startJeu(jeu *j){
 			}
 			
 			if(strlen(input) == 1 && input[0] == 'q'){
-				erreur = 0;
+				tourSucces = 1;
 				sortie = 1;
 			}else if(strlen(input) == 1 && input[0] == 'c'){
 				printf("Historique des coups :\n");
@@ -67,7 +67,7 @@ void startJeu(jeu *j){
 				removeLastH(j->coups);
 				jouerHistorique(j);
 				j->joueur = (j->joueur == 'b')? 'n' : 'b';
-				erreur = 0;
+				tourSucces = 1;
 			}else if(strlen(input) == 1 && input[0] == 'h'){
 				printf("v : heuristique du dernier coups\nc : historique des coups\nr : annuler dernier coups\ns : sauvegarder l'historique des coups\np : sauvegarder le plateau\nq : quitter\n");
 			}else if(strlen(input) == 1 && input[0] == 's'){
@@ -94,16 +94,12 @@ void startJeu(jeu *j){
 				b = input[4];
 				printf("Déplacement de (%c,%c) en (%c,%c) : ", x, y, a, b);
 				if(estPieceDuJoueur(j->list, x, y, j->joueur) && deplaValide(j->list, j->joueur, x, y, a, b)){
-					victoire = deplaPiece(j->list, x, y, a, b);
+					tourSucces = deplaPiece(j->list, x, y, a, b);
 					coupsSucces = 1;
-					if(victoire){
-						printf("[succès][%d]", victoire);
-						erreur = 0;
-					}
+					printf("[succès]\n");
 				}else{
-					printf("[impossible]");
+					printf("[impossible]\n");
 				}
-				printf("\n");
 			}else if(estDeploiementDouble(input, j->joueur)){
 				x = input[0];
 				y = input[1];
@@ -114,16 +110,12 @@ void startJeu(jeu *j){
 				commencePar = input[2];
 				printf("Déploiement de (%c,%c) en (%c,%c) commençant par les %s en (%c,%c)\n", x, y, a, b, (commencePar == '+')? "carrés" : "ronds", a1, b1);
 				if(estPieceDuJoueur(j->list, x, y, j->joueur) && deploValide(j->list, j->joueur, commencePar, x, y, a, b, a1, b1)){
-					victoire = deploPieceDouble(j->list, j->joueur, commencePar, x, y, a, b, a1, b1);
+					tourSucces = deploPieceDouble(j->list, j->joueur, commencePar, x, y, a, b, a1, b1);
 					coupsSucces = 1;
-					if(victoire){
-						printf("[succès][%d]", victoire);
-						erreur = 0;
-					}
+					printf("[succès]\n");
 				}else{
-					printf("[impossible]");
+					printf("[impossible]\n");
 				}
-				printf("\n");
 			}else if(estDeploiementTriple(input, j->joueur)){
 				x = input[0];
 				y = input[1];
@@ -136,23 +128,19 @@ void startJeu(jeu *j){
 				commencePar = input[2];
 				printf("Déploiement de (%c,%c) en (%c,%c) commençant par les %s en (%c,%c)(%c,%c)\n", x, y, a, b, (commencePar == '+')? "carrés" : "ronds", a1, b1, a2, b2);
 				if(estPieceDuJoueur(j->list, x, y, j->joueur) && deploValide(j->list, j->joueur, commencePar, x, y, a, b, a1, b1)){
+					tourSucces = deploPieceTriple(j->list, j->joueur, commencePar, x, y, a, b, a1, b1, a2, b2);
 					coupsSucces = 1;
-					victoire = deploPieceTriple(j->list, j->joueur, commencePar, x, y, a, b, a1, b1, a2, b2);
-					if(victoire){
-						printf("[succès][%d]", victoire);
-						erreur = 0;
-					}
+					printf("[succès]\n");
 				}else{
-					printf("[impossible]");
+					printf("[impossible]\n");
 				}
-				printf("\n");
 			}else{
 				printf("Mauvaises coordonnées !\n");
 			}
-		}while(erreur);
+		}while(tourSucces == 0);
 		if(coupsSucces) addListeH(j->coups, input);
+		if(testVictoire(j->list, j->joueur)) victoire = (j->joueur == 'b')? 2 : 3;
 		j->joueur = (j->joueur == 'b')? 'n' : 'b';
-		if(testVictoireAucunePiece(j->list, j->joueur) == 1) victoire = (j->joueur == 'b')? 3 : 2;
 	}
 	if(victoire > 1){
 		if(victoire == 2) printf("Victoire du joueur Blanc !\n");
@@ -214,22 +202,23 @@ int estPieceDuJoueur(liste *l, char x, char y, char couleur){
 	return 1;
 }
 
-/* Test s'il n'y a plus de pièce de la couleur sur le plateau de jeu */
-int testVictoireAucunePiece(liste *l, char couleur){
+/* Test s'il y a vitoire du joueur de la couleur en argument */
+int testVictoire(liste *l, char couleur){
 	noeud *courant;
+	int bool = 1;
 	courant = l->first;
 	while(courant != NULL){
-		if(courant->p->couleur == couleur) return 0;
+		if(courant->p->couleur == couleur && ((couleur == 'b' && courant->p->y == '9') || (couleur == 'n' && courant->p->y == '1'))) return 1;
+		if(courant->p->couleur != couleur) bool = 0;
 		courant = courant->next;
 	}
-	return 1;
+	return bool;
 }
 
 /* Rejoue l'historique des coups à partir de la configuration de départ */
 void jouerHistorique(jeu *j){
 	noeudH *courant;
 	noeud *starterC;
-	int victoire;
 	
 	freeListe(j->list);
 	j->list = initListe();
@@ -246,7 +235,7 @@ void jouerHistorique(jeu *j){
 	while(courant != NULL){
 		if(estMouvement(courant->c, j->joueur)){
 			if(estPieceDuJoueur(j->list, courant->c[0], courant->c[1], j->joueur) && deplaValide(j->list, j->joueur, courant->c[0], courant->c[1], courant->c[3], courant->c[4])){
-				victoire = deplaPiece(j->list, courant->c[0], courant->c[1], courant->c[3], courant->c[4]);
+				deplaPiece(j->list, courant->c[0], courant->c[1], courant->c[3], courant->c[4]);
 			}else{
 				printf("Erreur : mouvement impossible %s\n", courant->c);
 				printListeH(j->coups);
@@ -254,14 +243,14 @@ void jouerHistorique(jeu *j){
 			}
 		}else if(estDeploiementDouble(courant->c, j->joueur)){
 			if(estPieceDuJoueur(j->list, courant->c[0], courant->c[1], j->joueur) && deploValide(j->list, j->joueur, courant->c[2], courant->c[0], courant->c[1], courant->c[6], courant->c[7], courant->c[3], courant->c[4])){
-				victoire = deploPieceDouble(j->list, j->joueur, courant->c[2], courant->c[0], courant->c[1], courant->c[6], courant->c[7], courant->c[3], courant->c[4]);
+				deploPieceDouble(j->list, j->joueur, courant->c[2], courant->c[0], courant->c[1], courant->c[6], courant->c[7], courant->c[3], courant->c[4]);
 			}else{
 				printf("Erreur : mouvement impossible %s\n", courant->c);
 				exit(1);
 			}
 		}else if(estDeploiementTriple(courant->c, j->joueur)){
 			if(estPieceDuJoueur(j->list, courant->c[0], courant->c[1], j->joueur) && deploValide(j->list, j->joueur, courant->c[2], courant->c[0], courant->c[1], courant->c[9], courant->c[10], courant->c[3], courant->c[4])){
-				victoire = deploPieceTriple(j->list, j->joueur, courant->c[2], courant->c[0], courant->c[1], courant->c[9], courant->c[10], courant->c[3], courant->c[4], courant->c[6], courant->c[7]);
+				deploPieceTriple(j->list, j->joueur, courant->c[2], courant->c[0], courant->c[1], courant->c[9], courant->c[10], courant->c[3], courant->c[4], courant->c[6], courant->c[7]);
 			}else{
 				printf("Erreur : mouvement impossible %s\n", courant->c);
 				exit(1);
@@ -271,9 +260,7 @@ void jouerHistorique(jeu *j){
 			exit(1);
 		}
 		
-		if(victoire > 1){
-			return;
-		}
+		if(testVictoire(j->list, j->joueur)) return;
 		
 		j->joueur = (j->joueur == 'b')? 'n' : 'b';
 		if(j->joueur == 'b') j->tour++;
@@ -743,7 +730,7 @@ char* meilleurCoups(jeu *j){
 /* Minimax */
 int minimaxMax(jeu *j, int profondeur, int profondeurMax, char couleur){
 	char *coups, commencePar, *coupsTmp;
-	int valeurMax = INT_MIN, tmp, i;
+	int valeurMax = INT_MIN, tmp;
 	listeC *coordCouleur;
 	listeC *deplaPossibles;
 	listeC *deploPossibles;
@@ -751,7 +738,7 @@ int minimaxMax(jeu *j, int profondeur, int profondeurMax, char couleur){
 	noeudC *courantDepla, *courantDeplo, *coordC;
 	piece *tmpPiece;
 	
-	if(j->coups->last->c[strlen(j->coups->last->c)-2] == '0' || j->coups->last->c[strlen(j->coups->last->c)-2] == '9' || testVictoireAucunePiece(j->list, j->joueur)){
+	if(testVictoire(j->list, j->joueur)){
 		valeurMax = INT_MAX/(profondeur +1);
 		return valeurMax;
 	}else if(profondeur == profondeurMax){
@@ -866,7 +853,7 @@ int minimaxMax(jeu *j, int profondeur, int profondeurMax, char couleur){
 /* Minimax */
 int minimaxMin(jeu *j, int profondeur, int profondeurMax, char couleur){
 	char *coups, commencePar, *coupsTmp;
-	int valeurMax = INT_MAX, tmp, i;
+	int valeurMax = INT_MAX, tmp;
 	listeC *coordCouleur;
 	listeC *deplaPossibles;
 	listeC *deploPossibles;
@@ -874,7 +861,7 @@ int minimaxMin(jeu *j, int profondeur, int profondeurMax, char couleur){
 	noeudC *courantDepla, *courantDeplo, *coordC;
 	piece *tmpPiece;
 	
-	if(j->coups->last->c[strlen(j->coups->last->c)-2] == '0' || j->coups->last->c[strlen(j->coups->last->c)-2] == '9' || testVictoireAucunePiece(j->list, j->joueur)){
+	if(testVictoire(j->list, j->joueur)){
 		valeurMax = INT_MIN/(profondeur +1);
 		return valeurMax;
 	}else if(profondeur == profondeurMax){
@@ -1101,8 +1088,6 @@ char* minimaxIA(jeu *j, int profondeur){
 		
 		coordC = coordC->next;
 	}
-	printf("VALEUR FINAL : %d\n", valeurMax);
-	printListeH(j->coups);
 	return coups;
 }
 

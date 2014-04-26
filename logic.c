@@ -181,8 +181,6 @@ int deplaPiece(liste *l, char x, char y, char a, char b){
 	tmp->x = a;
 	tmp->y = b;
 	addListe(l, tmp);
-	if(b == '0') return 3;
-	if(b == '9') return 2;
 	return 1;
 }
 
@@ -499,9 +497,6 @@ int deploPieceDouble(liste *l, char couleur, char commencePar, char x, char y, c
 		deploSurCase(l, couleur, a1, b1, ((commencePar == '+')? carre : rond));
 		deploSurCase(l, couleur, a, b, ((commencePar == '+')? rond : carre));
 	}
-	
-	if(b > '8') return 2;
-	if(b < '1') return 3;
 	return 1;
 }
 
@@ -544,8 +539,6 @@ int deploPieceTriple(liste *l, char couleur, char commencePar, char x, char y, c
 		}
 	}
 	
-	if(b > '8') return 2;
-	if(b < '1') return 3;
 	return 1;
 }
 

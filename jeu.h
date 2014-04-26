@@ -21,7 +21,7 @@ int estMouvement(char[], char);
 int estDeploiementDouble(char[], char);
 int estDeploiementTriple(char[], char);
 int estPieceDuJoueur(liste*, char, char, char);
-int testVictoireAucunePiece(liste*, char);
+int testVictoire(liste*, char);
 void jouerHistorique(jeu *);
 void initPlateau(liste*);
 void printPlateau(jeu *);
