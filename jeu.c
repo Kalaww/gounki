@@ -455,7 +455,7 @@ char* jouerIA(jeu *j){
 	valeur = (j->joueur == 'b')? j->blanc : j->noir;
 	if(valeur == 2) return randomIA(j);
 	else if(valeur == 3) return meilleurCoups(j);
-	else if(valeur == 4) return minimaxIA(j, 2);
+	else if(valeur == 4) return minimaxIA(j, 4);
 	return NULL;
 }
 
@@ -534,73 +534,50 @@ char* randomIA(jeu *j){
 
 /* Heuristique */
 int evaluationPlateau(jeu *j, char couleur){
-	int valeur = 0;
+	int valeur = 10000, tmp;
 	noeud *courant;
 	
 	courant = j->list->first;
 	while(courant != NULL){
-		if(courant->p->couleur == couleur){
-			/* test victoire */
-			if((courant->p->couleur == 'b' && courant->p->y == '9') || (courant->p->couleur == 'n' && courant->p->y == '0')){
-				valeur = INT_MAX;
-				return valeur;
-			}
-			
-			/* valeur piece */
-			switch(courant->p->t){
-				case carre:
-				case rond:
-					valeur += 1; break;
-				case ccarre:
-				case rrond:
-				case crond:
-					valeur += 8; break;
-				case cccarre:
-				case rrrond:
-					valeur += 64; break;
-				case ccrond:
-				case crrond:
-					valeur += 128; break;
-				case vide:
-				default:
-					break;
-			}
-			
-			/* Valeur avancée */
-			if(couleur == 'b')
-				valeur += courant->p->y - '1'; 
-			else
-				valeur += '8' - courant->p->y;
+		tmp = 0;
+		/* test victoire */
+		if((courant->p->couleur == 'b' && courant->p->y == '9') || (courant->p->couleur == 'n' && courant->p->y == '0')){
+			if(courant->p->couleur == couleur) valeur = INT_MAX;
+			else valeur = 0;
+			return valeur;
 		}
+		
+		/* valeur piece */
+		switch(courant->p->t){
+			case carre:
+			case rond:
+				tmp = 1; break;
+			case ccarre:
+			case rrond:
+			case crond:
+				tmp = 8; break;
+			case cccarre:
+			case rrrond:
+				tmp = 64; break;
+			case ccrond:
+			case crrond:
+				tmp = 128; break;
+			case vide:
+			default:
+				break;
+		}
+		
+		/* Valeur avancée */
+		if(couleur == 'b')
+			valeur *= courant->p->y - '1'; 
+		else
+			valeur *= '8' - courant->p->y;
+		
+		if(courant->p->couleur == couleur) valeur += tmp;
+		else valeur -= tmp;
+		
 		courant = courant->next;
 	}
-	
-	/* Pieces adversaires */
-	while(courant != NULL){
-		if(courant->p->couleur != couleur){
-			/* valeur piece */
-			switch(courant->p->t){
-				case carre:
-				case rond:
-					valeur -= 1; break;
-				case ccarre:
-				case rrond:
-				case crond:
-					valeur -= 16; break;
-				case cccarre:
-				case rrrond:
-					valeur -= 128; break;
-				case ccrond:
-				case crrond:
-					valeur -= 256; break;
-				case vide:
-				default:
-					break;
-			}
-		}
-		courant = courant->next;
-	}
-	
 	return valeur;
 }
 
@@ -728,7 +705,7 @@ char* meilleurCoups(jeu *j){
 }
 
 /* Minimax */
-int minimaxMax(jeu *j, int profondeur, int profondeurMax, char couleur){
+int minimaxMax(jeu *j, int profondeur, int profondeurMax, char couleur, int alpha, int beta){
 	char *coups, commencePar, *coupsTmp;
 	int valeurMax = INT_MIN, tmp;
 	listeC *coordCouleur;
@@ -776,12 +753,19 @@ int minimaxMax(jeu *j, int profondeur, int profondeurMax, char couleur){
 			}
 			addListeH(j->coups, coupsTmp);
 			j->joueur = (j->joueur == 'b')? 'n':'b';
-			tmp = minimaxMin(j, profondeur+1, profondeurMax, couleur);
+			tmp = minimaxMin(j, profondeur+1, profondeurMax, couleur, alpha, beta);
 			
 			if(tmp > valeurMax){
 				valeurMax = tmp;
 				strcpy(coups, coupsTmp);
 			}
+			if(valeurMax >= beta){
+				removeLastH(j->coups);
+				jouerHistorique(j);
+				return valeurMax;
+			}
+			
+			if(valeurMax >= alpha) alpha = valeurMax;
 			
 			removeLastH(j->coups);
 			jouerHistorique(j);
@@ -832,12 +816,20 @@ int minimaxMax(jeu *j, int profondeur, int profondeurMax, char couleur){
 			
 			addListeH(j->coups, coupsTmp);
 			j->joueur = (j->joueur == 'b')? 'n':'b';
-			tmp = minimaxMin(j, profondeur+1, profondeurMax, couleur);
+			tmp = minimaxMin(j, profondeur+1, profondeurMax, couleur, alpha, beta);
 			
 			if(tmp > valeurMax){
 				valeurMax = tmp;
 				strcpy(coups, coupsTmp);
 			}
+			
+			if(valeurMax >= beta){
+				removeLastH(j->coups);
+				jouerHistorique(j);
+				return valeurMax;
+			}
+			
+			if(valeurMax >= alpha) alpha = valeurMax;
 			
 			removeLastH(j->coups);
 			jouerHistorique(j);
@@ -851,7 +843,7 @@ int minimaxMax(jeu *j, int profondeur, int profondeurMax, char couleur){
 }
 
 /* Minimax */
-int minimaxMin(jeu *j, int profondeur, int profondeurMax, char couleur){
+int minimaxMin(jeu *j, int profondeur, int profondeurMax, char couleur, int alpha, int beta){
 	char *coups, commencePar, *coupsTmp;
 	int valeurMax = INT_MAX, tmp;
 	listeC *coordCouleur;
@@ -900,12 +892,20 @@ int minimaxMin(jeu *j, int profondeur, int profondeurMax, char couleur){
 			
 			addListeH(j->coups, coupsTmp);
 			j->joueur = (j->joueur == 'b')? 'n':'b';
-			tmp = minimaxMax(j, profondeur+1, profondeurMax, couleur);
+			tmp = minimaxMax(j, profondeur+1, profondeurMax, couleur, alpha, beta);
 			
 			if(tmp < valeurMax){
 				valeurMax = tmp;
 				strcpy(coups, coupsTmp);
 			}
+			
+			if(alpha >= valeurMax){
+				removeLastH(j->coups);
+				jouerHistorique(j);
+				return valeurMax;
+			}
+			
+			if(beta >= valeurMax) beta = valeurMax;
 			
 			removeLastH(j->coups);
 			jouerHistorique(j);
@@ -956,12 +956,20 @@ int minimaxMin(jeu *j, int profondeur, int profondeurMax, char couleur){
 			
 			addListeH(j->coups, coupsTmp);
 			j->joueur = (j->joueur == 'b')? 'n':'b';
-			tmp = minimaxMax(j, profondeur+1, profondeurMax, couleur);
+			tmp = minimaxMax(j, profondeur+1, profondeurMax, couleur, alpha, beta);
 			
 			if(tmp < valeurMax){
 				valeurMax = tmp;
 				strcpy(coups, coupsTmp);
 			}
+			
+			if(alpha >= valeurMax){
+				removeLastH(j->coups);
+				jouerHistorique(j);
+				return valeurMax;
+			}
+			
+			if(beta >= valeurMax) beta = valeurMax;
 			
 			removeLastH(j->coups);
 			jouerHistorique(j);
@@ -1016,7 +1024,7 @@ char* minimaxIA(jeu *j, int profondeur){
 			}
 			addListeH(j->coups, coupsTmp);
 			j->joueur = (j->joueur == 'b')? 'n':'b';
-			tmp = minimaxMin(j, 0, profondeur, (j->joueur == 'b')? 'n':'b');
+			tmp = minimaxMin(j, 0, profondeur, (j->joueur == 'b')? 'n':'b', INT_MIN, INT_MAX);
 			
 			if(tmp > valeurMax){
 				valeurMax = tmp;
@@ -1073,7 +1081,7 @@ char* minimaxIA(jeu *j, int profondeur){
 			
 			addListeH(j->coups, coupsTmp);
 			j->joueur = (j->joueur == 'b')? 'n':'b';
-			tmp = minimaxMin(j, 0, profondeur, (j->joueur == 'b')? 'n':'b');
+			tmp = minimaxMin(j, 0, profondeur, (j->joueur == 'b')? 'n':'b', INT_MIN, INT_MAX);
 			
 			if(tmp > valeurMax){
 				valeurMax = tmp;
