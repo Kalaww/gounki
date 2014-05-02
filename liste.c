@@ -107,14 +107,13 @@ void freeListeC(listeC *l){
 
 /* Free noeud de coordonnées triples */
 void freeNoeudC(noeudC *n){
-	if(!n) return;
-	free(n->c);
+	if(n) free(n->c);
 	free(n);
 }
 
 /* Free noeud récursif de coordonnées triples */
 void freeNoeudRecursiveC(noeudC *n){
-	if(n && n->next) freeNoeudRecursiveC(n->next);
+	if(n) freeNoeudRecursiveC(n->next);
 	freeNoeudC(n);
 }
 

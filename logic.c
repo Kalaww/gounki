@@ -19,10 +19,13 @@ int deplaValide(liste *l, char couleur, char x, char y, char a, char b){
 	cases = deplaCasesPossibles(l, depart->t, depart->couleur, depart->x, depart->y);
 	tmp = cases->first;
 	while(tmp != NULL){
-		if(tmp->c->x == a && tmp->c->y == b) return 1;
+		if(tmp->c->x == a && tmp->c->y == b){
+			freeListeC(cases);
+			return 1;
+		}
 		tmp = tmp->next;
 	}
-	
+	freeListeC(cases);
 	return 0;
 }
 
@@ -469,12 +472,17 @@ int deploValide(liste *l, char couleur, char commencePar, char x, char y, char a
 	tmp = cases->first;
 	while(tmp != NULL){
 		if(tmp->c->x1 == a1 && tmp->c->y1 == b1 && tmp->c->x == a && tmp->c->y == b){
-			if(y == tmp->c->y1 || x == tmp->c->x1) return commencePar == '+';
-			else return commencePar == '*';
+			if(y == tmp->c->y1 || x == tmp->c->x1){
+				freeListeC(cases);
+				return commencePar == '+';
+			}else{
+				freeListeC(cases);
+				return commencePar == '*';
+			}
 		}
 		tmp = tmp->next;
 	}
-	
+	freeListeC(cases);
 	return 0;
 }
 

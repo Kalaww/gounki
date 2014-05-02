@@ -36,6 +36,7 @@ void startJeu(jeu *j){
 	char sortie = 0, x, y, a, b, a1, b1, a2, b2, commencePar, *vide;
 	char nomSauvegarde[100];
 	char input[20];
+	char *tmp;
 	int victoire = 0, coupsSucces = 0, tourSucces = 0;
 	while(sortie != 1 && victoire < 2){
 		printPlateau(j);
@@ -44,7 +45,9 @@ void startJeu(jeu *j){
 		do{
 			/* Tour IA */
 			if((j->joueur == 'b' && j->blanc > 1) || (j->joueur == 'n' && j->noir > 1)){
-				strcpy(input, jouerIA(j));
+				tmp = jouerIA(j);
+				strcpy(input, tmp);
+				free(tmp);
 			/* Tour humain */
 			}else{
 				printf("Quelle pièce souhaitez vous déplacer ? ");
@@ -230,6 +233,7 @@ void jouerHistorique(jeu *j){
 		addListe(j->list, initPiece(starterC->p->x, starterC->p->y, starterC->p->couleur, starterC->p->t));
 		starterC = starterC->next;
 	}
+	freeNoeud(starterC);
 	
 	courant = j->coups->first;
 	while(courant != NULL){
@@ -266,6 +270,7 @@ void jouerHistorique(jeu *j){
 		if(j->joueur == 'b') j->tour++;
 		courant = courant->next;
 	}
+	freeNoeudH(courant);
 }
 
 /* Charge un historique de coups situé dans le fichier en paramètre */
@@ -455,7 +460,7 @@ char* jouerIA(jeu *j){
 	valeur = (j->joueur == 'b')? j->blanc : j->noir;
 	if(valeur == 2) return randomIA(j);
 	else if(valeur == 3) return meilleurCoups(j);
-	else if(valeur == 4) return minimaxIA(j, 4);
+	else if(valeur == 4) return minimaxIA(j, 2);
 	return NULL;
 }
 
@@ -501,6 +506,8 @@ char* randomIA(jeu *j){
 			coup[3] = courantC->c->x;
 			coup[4] = courantC->c->y;
 			coup[5] = '\0';
+			freeListeC(deplacement);
+			freeListeC(deploiement);
 			return coup;
 		}
 		
@@ -526,9 +533,13 @@ char* randomIA(jeu *j){
 				coup[10] = courantC->c->y;
 				coup[11] = '\0';
 			}
+			freeListeC(deplacement);
+			freeListeC(deploiement);
 			return coup;
 		}
 	}
+	freeListeC(deplacement);
+	freeListeC(deploiement);
 	return NULL;
 }
 
@@ -712,7 +723,7 @@ int minimaxMax(jeu *j, int profondeur, int profondeurMax, char couleur, int alph
 	listeC *deplaPossibles;
 	listeC *deploPossibles;
 	noeud *courantP;
-	noeudC *courantDepla, *courantDeplo, *coordC;
+	noeudC *courant, *coordC;
 	piece *tmpPiece;
 	
 	if(testVictoire(j->list, j->joueur)){
@@ -731,6 +742,7 @@ int minimaxMax(jeu *j, int profondeur, int profondeurMax, char couleur, int alph
 		if(courantP->p->couleur == j->joueur) addListeC(coordCouleur, initCoord(courantP->p->x, courantP->p->y));
 		courantP = courantP->next;
 	}
+	freeNoeud(courantP);
 	
 	/* toutes les pièces */
 	coordC = coordCouleur->first;
@@ -738,17 +750,16 @@ int minimaxMax(jeu *j, int profondeur, int profondeurMax, char couleur, int alph
 		tmpPiece = getPieceByCoordListe(j->list, coordC->c->x, coordC->c->y);
 		if(tmpPiece == NULL) break;
 		deplaPossibles = deplaCasesPossibles(j->list, tmpPiece->t, j->joueur, coordC->c->x, coordC->c->y);
-		deploPossibles = deploCasesPossibles(j->list, tmpPiece->t, j->joueur, coordC->c->x, coordC->c->y);
 		
 		/* tous les deplacements de la pièce */
-		courantDepla = deplaPossibles->first;
-		while(courantDepla != NULL){
-			if(deplaPiece(j->list, coordC->c->x, coordC->c->y, courantDepla->c->x, courantDepla->c->y)){
+		courant = deplaPossibles->first;
+		while(courant != NULL){
+			if(deplaPiece(j->list, coordC->c->x, coordC->c->y, courant->c->x, courant->c->y)){
 				coupsTmp[0] = coordC->c->x;
 				coupsTmp[1] = coordC->c->y;
 				coupsTmp[2] = '-';
-				coupsTmp[3] = courantDepla->c->x;
-				coupsTmp[4] = courantDepla->c->y;
+				coupsTmp[3] = courant->c->x;
+				coupsTmp[4] = courant->c->y;
 				coupsTmp[5] = 0;
 			}
 			addListeH(j->coups, coupsTmp);
@@ -762,6 +773,10 @@ int minimaxMax(jeu *j, int profondeur, int profondeurMax, char couleur, int alph
 			if(valeurMax >= beta){
 				removeLastH(j->coups);
 				jouerHistorique(j);
+				freeListeC(deplaPossibles);
+				freeListeC(coordCouleur);
+				free(coups);
+				free(coupsTmp);
 				return valeurMax;
 			}
 			
@@ -769,47 +784,49 @@ int minimaxMax(jeu *j, int profondeur, int profondeurMax, char couleur, int alph
 			
 			removeLastH(j->coups);
 			jouerHistorique(j);
-			courantDepla = courantDepla->next;
+			courant = courant->next;
 		}
+		freeListeC(deplaPossibles);
 		
 		/* tous les déploiements de la pièce */
-		courantDeplo = deploPossibles->first;
-		while(courantDeplo != NULL){
+		deploPossibles = deploCasesPossibles(j->list, tmpPiece->t, j->joueur, coordC->c->x, coordC->c->y);
+		courant = deploPossibles->first;
+		while(courant != NULL){
 			/* déploiement double */
-			if(courantDeplo->c->x2 == 0 && courantDeplo->c->y2 == 0){
+			if(courant->c->x2 == 0 && courant->c->y2 == 0){
 				tmpPiece = getPieceByCoordListe(j->list, coordC->c->x, coordC->c->y);
-				if(tmpPiece != NULL && (tmpPiece->t == ccarre || courantDeplo->c->x1 == coordC->c->x || courantDeplo->c->y1 == coordC->c->y)) commencePar = '+';
+				if(tmpPiece != NULL && (tmpPiece->t == ccarre || courant->c->x1 == coordC->c->x || courant->c->y1 == coordC->c->y)) commencePar = '+';
 				else if(tmpPiece != NULL) commencePar = '*';
 				else break;
-				if(deploPieceDouble(j->list, j->joueur, commencePar, coordC->c->x, coordC->c->y, courantDeplo->c->x, courantDeplo->c->y, courantDeplo->c->x1, courantDeplo->c->y1)){
+				if(deploPieceDouble(j->list, j->joueur, commencePar, coordC->c->x, coordC->c->y, courant->c->x, courant->c->y, courant->c->x1, courant->c->y1)){
 					coupsTmp[0] = coordC->c->x;
 					coupsTmp[1] = coordC->c->y;
 					coupsTmp[2] = commencePar;
-					coupsTmp[3] = courantDeplo->c->x1;
-					coupsTmp[4] = courantDeplo->c->y1;
+					coupsTmp[3] = courant->c->x1;
+					coupsTmp[4] = courant->c->y1;
 					coupsTmp[5] = '-';
-					coupsTmp[6] = courantDeplo->c->x;
-					coupsTmp[7] = courantDeplo->c->y;
+					coupsTmp[6] = courant->c->x;
+					coupsTmp[7] = courant->c->y;
 					coupsTmp[8] = 0;
 				}
 			/* déploiement triple */
 			}else{
 				tmpPiece = getPieceByCoordListe(j->list, coordC->c->x, coordC->c->y);
-				if(tmpPiece != NULL && (tmpPiece->t == cccarre || courantDeplo->c->x1 == coordC->c->x || courantDeplo->c->y1 == coordC->c->y)) commencePar = '+';
+				if(tmpPiece != NULL && (tmpPiece->t == cccarre || courant->c->x1 == coordC->c->x || courant->c->y1 == coordC->c->y)) commencePar = '+';
 				else if(tmpPiece != NULL) commencePar = '*';
 				else break;
-				if(deploPieceTriple(j->list, j->joueur, commencePar, coordC->c->x, coordC->c->y, courantDeplo->c->x, courantDeplo->c->y, courantDeplo->c->x1, courantDeplo->c->y1, courantDeplo->c->x2, courantDeplo->c->y2)){
+				if(deploPieceTriple(j->list, j->joueur, commencePar, coordC->c->x, coordC->c->y, courant->c->x, courant->c->y, courant->c->x1, courant->c->y1, courant->c->x2, courant->c->y2)){
 					coupsTmp[0] = coordC->c->x;
 					coupsTmp[1] = coordC->c->y;
 					coupsTmp[2] = commencePar;
-					coupsTmp[3] = courantDeplo->c->x1;
-					coupsTmp[4] = courantDeplo->c->y1;
+					coupsTmp[3] = courant->c->x1;
+					coupsTmp[4] = courant->c->y1;
 					coupsTmp[5] = '-';
-					coupsTmp[6] = courantDeplo->c->x2;
-					coupsTmp[7] = courantDeplo->c->y2;
+					coupsTmp[6] = courant->c->x2;
+					coupsTmp[7] = courant->c->y2;
 					coupsTmp[8] = '-';
-					coupsTmp[9] = courantDeplo->c->x;
-					coupsTmp[10] = courantDeplo->c->y;
+					coupsTmp[9] = courant->c->x;
+					coupsTmp[10] = courant->c->y;
 					coupsTmp[11] = 0;
 				}
 			}
@@ -826,6 +843,10 @@ int minimaxMax(jeu *j, int profondeur, int profondeurMax, char couleur, int alph
 			if(valeurMax >= beta){
 				removeLastH(j->coups);
 				jouerHistorique(j);
+				freeListeC(deploPossibles);
+				freeListeC(coordCouleur);
+				free(coups);
+				free(coupsTmp);
 				return valeurMax;
 			}
 			
@@ -834,11 +855,16 @@ int minimaxMax(jeu *j, int profondeur, int profondeurMax, char couleur, int alph
 			removeLastH(j->coups);
 			jouerHistorique(j);
 			
-			courantDeplo = courantDeplo->next;
+			courant = courant->next;
 		}
+		freeListeC(deploPossibles);
 		
 		coordC = coordC->next;
 	}
+	freeNoeudC(courant);
+	free(coups);
+	free(coupsTmp);
+	freeListeC(coordCouleur);
 	return valeurMax;
 }
 
@@ -850,7 +876,7 @@ int minimaxMin(jeu *j, int profondeur, int profondeurMax, char couleur, int alph
 	listeC *deplaPossibles;
 	listeC *deploPossibles;
 	noeud *courantP;
-	noeudC *courantDepla, *courantDeplo, *coordC;
+	noeudC *courant, *coordC;
 	piece *tmpPiece;
 	
 	if(testVictoire(j->list, j->joueur)){
@@ -869,6 +895,7 @@ int minimaxMin(jeu *j, int profondeur, int profondeurMax, char couleur, int alph
 		if(courantP->p->couleur == j->joueur) addListeC(coordCouleur, initCoord(courantP->p->x, courantP->p->y));
 		courantP = courantP->next;
 	}
+	freeNoeud(courantP);
 	
 	/* toutes les pièces */
 	coordC = coordCouleur->first;
@@ -876,17 +903,16 @@ int minimaxMin(jeu *j, int profondeur, int profondeurMax, char couleur, int alph
 		tmpPiece = getPieceByCoordListe(j->list, coordC->c->x, coordC->c->y);
 		if(tmpPiece == NULL) break;
 		deplaPossibles = deplaCasesPossibles(j->list, tmpPiece->t, j->joueur, coordC->c->x, coordC->c->y);
-		deploPossibles = deploCasesPossibles(j->list, tmpPiece->t, j->joueur, coordC->c->x, coordC->c->y);
 		
 		/* tous les deplacements de la pièce */
-		courantDepla = deplaPossibles->first;
-		while(courantDepla != NULL){
-			if(deplaPiece(j->list, coordC->c->x, coordC->c->y, courantDepla->c->x, courantDepla->c->y)){
+		courant = deplaPossibles->first;
+		while(courant != NULL){
+			if(deplaPiece(j->list, coordC->c->x, coordC->c->y, courant->c->x, courant->c->y)){
 				coupsTmp[0] = coordC->c->x;
 				coupsTmp[1] = coordC->c->y;
 				coupsTmp[2] = '-';
-				coupsTmp[3] = courantDepla->c->x;
-				coupsTmp[4] = courantDepla->c->y;
+				coupsTmp[3] = courant->c->x;
+				coupsTmp[4] = courant->c->y;
 				coupsTmp[5] = 0;
 			}
 			
@@ -902,6 +928,10 @@ int minimaxMin(jeu *j, int profondeur, int profondeurMax, char couleur, int alph
 			if(alpha >= valeurMax){
 				removeLastH(j->coups);
 				jouerHistorique(j);
+				freeListeC(deplaPossibles);
+				freeListeC(coordCouleur);
+				free(coups);
+				free(coupsTmp);
 				return valeurMax;
 			}
 			
@@ -909,47 +939,49 @@ int minimaxMin(jeu *j, int profondeur, int profondeurMax, char couleur, int alph
 			
 			removeLastH(j->coups);
 			jouerHistorique(j);
-			courantDepla = courantDepla->next;
+			courant = courant->next;
 		}
+		freeListeC(deplaPossibles);
 		
 		/* tous les déploiements de la pièce */
-		courantDeplo = deploPossibles->first;
-		while(courantDeplo != NULL){
+		deploPossibles = deploCasesPossibles(j->list, tmpPiece->t, j->joueur, coordC->c->x, coordC->c->y);
+		courant = deploPossibles->first;
+		while(courant != NULL){
 			/* déploiement double */
-			if(courantDeplo->c->x2 == 0 && courantDeplo->c->y2 == 0){
+			if(courant->c->x2 == 0 && courant->c->y2 == 0){
 				tmpPiece = getPieceByCoordListe(j->list, coordC->c->x, coordC->c->y);
-				if(tmpPiece != NULL && (tmpPiece->t == ccarre || courantDeplo->c->x1 == coordC->c->x || courantDeplo->c->y1 == coordC->c->y)) commencePar = '+';
+				if(tmpPiece != NULL && (tmpPiece->t == ccarre || courant->c->x1 == coordC->c->x || courant->c->y1 == coordC->c->y)) commencePar = '+';
 				else if(tmpPiece != NULL) commencePar = '*';
 				else break;
-				if(deploPieceDouble(j->list, j->joueur, commencePar, coordC->c->x, coordC->c->y, courantDeplo->c->x, courantDeplo->c->y, courantDeplo->c->x1, courantDeplo->c->y1)){
+				if(deploPieceDouble(j->list, j->joueur, commencePar, coordC->c->x, coordC->c->y, courant->c->x, courant->c->y, courant->c->x1, courant->c->y1)){
 					coupsTmp[0] = coordC->c->x;
 					coupsTmp[1] = coordC->c->y;
 					coupsTmp[2] = commencePar;
-					coupsTmp[3] = courantDeplo->c->x1;
-					coupsTmp[4] = courantDeplo->c->y1;
+					coupsTmp[3] = courant->c->x1;
+					coupsTmp[4] = courant->c->y1;
 					coupsTmp[5] = '-';
-					coupsTmp[6] = courantDeplo->c->x;
-					coupsTmp[7] = courantDeplo->c->y;
+					coupsTmp[6] = courant->c->x;
+					coupsTmp[7] = courant->c->y;
 					coupsTmp[8] = 0;
 				}
 			/* déploiement triple */
 			}else{
 				tmpPiece = getPieceByCoordListe(j->list, coordC->c->x, coordC->c->y);
-				if(tmpPiece != NULL && (tmpPiece->t == cccarre || courantDeplo->c->x1 == coordC->c->x || courantDeplo->c->y1 == coordC->c->y)) commencePar = '+';
+				if(tmpPiece != NULL && (tmpPiece->t == cccarre || courant->c->x1 == coordC->c->x || courant->c->y1 == coordC->c->y)) commencePar = '+';
 				else if(tmpPiece != NULL) commencePar = '*';
 				else break;
-				if(deploPieceTriple(j->list, j->joueur, commencePar, coordC->c->x, coordC->c->y, courantDeplo->c->x, courantDeplo->c->y, courantDeplo->c->x1, courantDeplo->c->y1, courantDeplo->c->x2, courantDeplo->c->y2)){
+				if(deploPieceTriple(j->list, j->joueur, commencePar, coordC->c->x, coordC->c->y, courant->c->x, courant->c->y, courant->c->x1, courant->c->y1, courant->c->x2, courant->c->y2)){
 					coupsTmp[0] = coordC->c->x;
 					coupsTmp[1] = coordC->c->y;
 					coupsTmp[2] = commencePar;
-					coupsTmp[3] = courantDeplo->c->x1;
-					coupsTmp[4] = courantDeplo->c->y1;
+					coupsTmp[3] = courant->c->x1;
+					coupsTmp[4] = courant->c->y1;
 					coupsTmp[5] = '-';
-					coupsTmp[6] = courantDeplo->c->x2;
-					coupsTmp[7] = courantDeplo->c->y2;
+					coupsTmp[6] = courant->c->x2;
+					coupsTmp[7] = courant->c->y2;
 					coupsTmp[8] = '-';
-					coupsTmp[9] = courantDeplo->c->x;
-					coupsTmp[10] = courantDeplo->c->y;
+					coupsTmp[9] = courant->c->x;
+					coupsTmp[10] = courant->c->y;
 					coupsTmp[11] = 0;
 				}
 			}
@@ -966,6 +998,10 @@ int minimaxMin(jeu *j, int profondeur, int profondeurMax, char couleur, int alph
 			if(alpha >= valeurMax){
 				removeLastH(j->coups);
 				jouerHistorique(j);
+				freeListeC(deploPossibles);
+				freeListeC(coordCouleur);
+				free(coups);
+				free(coupsTmp);
 				return valeurMax;
 			}
 			
@@ -974,11 +1010,16 @@ int minimaxMin(jeu *j, int profondeur, int profondeurMax, char couleur, int alph
 			removeLastH(j->coups);
 			jouerHistorique(j);
 			
-			courantDeplo = courantDeplo->next;
+			courant = courant->next;
 		}
+		freeListeC(deploPossibles);
 		
 		coordC = coordC->next;
 	}
+	freeNoeudC(courant);
+	freeListeC(coordCouleur);
+	free(coups);
+	free(coupsTmp);
 	return valeurMax;
 }
 
@@ -990,7 +1031,7 @@ char* minimaxIA(jeu *j, int profondeur){
 	listeC *deplaPossibles;
 	listeC *deploPossibles;
 	noeud *courantP;
-	noeudC *courantDepla, *courantDeplo, *coordC;
+	noeudC *courant, *coordC;
 	piece *tmpPiece;
 	
 	coups = malloc(sizeof(char)*20);
@@ -1002,6 +1043,7 @@ char* minimaxIA(jeu *j, int profondeur){
 		if(courantP->p->couleur == j->joueur) addListeC(coordCouleur, initCoord(courantP->p->x, courantP->p->y));
 		courantP = courantP->next;
 	}
+	freeNoeud(courantP);
 	
 	/* toutes les pièces */
 	coordC = coordCouleur->first;
@@ -1009,17 +1051,16 @@ char* minimaxIA(jeu *j, int profondeur){
 		tmpPiece = getPieceByCoordListe(j->list, coordC->c->x, coordC->c->y);
 		if(tmpPiece == NULL) break;
 		deplaPossibles = deplaCasesPossibles(j->list, tmpPiece->t, j->joueur, coordC->c->x, coordC->c->y);
-		deploPossibles = deploCasesPossibles(j->list, tmpPiece->t, j->joueur, coordC->c->x, coordC->c->y);
 		
 		/* tous les deplacements de la pièce */
-		courantDepla = deplaPossibles->first;
-		while(courantDepla != NULL){
-			if(deplaPiece(j->list, coordC->c->x, coordC->c->y, courantDepla->c->x, courantDepla->c->y)){
+		courant = deplaPossibles->first;
+		while(courant != NULL){
+			if(deplaPiece(j->list, coordC->c->x, coordC->c->y, courant->c->x, courant->c->y)){
 				coupsTmp[0] = coordC->c->x;
 				coupsTmp[1] = coordC->c->y;
 				coupsTmp[2] = '-';
-				coupsTmp[3] = courantDepla->c->x;
-				coupsTmp[4] = courantDepla->c->y;
+				coupsTmp[3] = courant->c->x;
+				coupsTmp[4] = courant->c->y;
 				coupsTmp[5] = 0;
 			}
 			addListeH(j->coups, coupsTmp);
@@ -1034,47 +1075,49 @@ char* minimaxIA(jeu *j, int profondeur){
 			removeLastH(j->coups);
 			jouerHistorique(j);
 			
-			courantDepla = courantDepla->next;
+			courant = courant->next;
 		}
+		freeListeC(deplaPossibles);
 		
 		/* tous les déploiements de la pièce */
-		courantDeplo = deploPossibles->first;
-		while(courantDeplo != NULL){
+		deploPossibles = deploCasesPossibles(j->list, tmpPiece->t, j->joueur, coordC->c->x, coordC->c->y);
+		courant = deploPossibles->first;
+		while(courant != NULL){
 			/* déploiement double */
-			if(courantDeplo->c->x2 == 0 && courantDeplo->c->y2 == 0){
+			if(courant->c->x2 == 0 && courant->c->y2 == 0){
 				tmpPiece = getPieceByCoordListe(j->list, coordC->c->x, coordC->c->y);
-				if(tmpPiece != NULL && (tmpPiece->t == ccarre || courantDeplo->c->x1 == coordC->c->x || courantDeplo->c->y1 == coordC->c->y)) commencePar = '+';
+				if(tmpPiece != NULL && (tmpPiece->t == ccarre || courant->c->x1 == coordC->c->x || courant->c->y1 == coordC->c->y)) commencePar = '+';
 				else if(tmpPiece != NULL) commencePar = '*';
 				else break;
-				if(deploPieceDouble(j->list, j->joueur, commencePar, coordC->c->x, coordC->c->y, courantDeplo->c->x, courantDeplo->c->y, courantDeplo->c->x1, courantDeplo->c->y1)){
+				if(deploPieceDouble(j->list, j->joueur, commencePar, coordC->c->x, coordC->c->y, courant->c->x, courant->c->y, courant->c->x1, courant->c->y1)){
 					coupsTmp[0] = coordC->c->x;
 					coupsTmp[1] = coordC->c->y;
 					coupsTmp[2] = commencePar;
-					coupsTmp[3] = courantDeplo->c->x1;
-					coupsTmp[4] = courantDeplo->c->y1;
+					coupsTmp[3] = courant->c->x1;
+					coupsTmp[4] = courant->c->y1;
 					coupsTmp[5] = '-';
-					coupsTmp[6] = courantDeplo->c->x;
-					coupsTmp[7] = courantDeplo->c->y;
+					coupsTmp[6] = courant->c->x;
+					coupsTmp[7] = courant->c->y;
 					coupsTmp[8] = 0;
 				}
 			/* déploiement triple */
 			}else{
 				tmpPiece = getPieceByCoordListe(j->list, coordC->c->x, coordC->c->y);
-				if(tmpPiece != NULL && (tmpPiece->t == cccarre || courantDeplo->c->x1 == coordC->c->x || courantDeplo->c->y1 == coordC->c->y)) commencePar = '+';
+				if(tmpPiece != NULL && (tmpPiece->t == cccarre || courant->c->x1 == coordC->c->x || courant->c->y1 == coordC->c->y)) commencePar = '+';
 				else if(tmpPiece != NULL) commencePar = '*';
 				else break;
-				if(deploPieceTriple(j->list, j->joueur, commencePar, coordC->c->x, coordC->c->y, courantDeplo->c->x, courantDeplo->c->y, courantDeplo->c->x1, courantDeplo->c->y1, courantDeplo->c->x2, courantDeplo->c->y2)){
+				if(deploPieceTriple(j->list, j->joueur, commencePar, coordC->c->x, coordC->c->y, courant->c->x, courant->c->y, courant->c->x1, courant->c->y1, courant->c->x2, courant->c->y2)){
 					coupsTmp[0] = coordC->c->x;
 					coupsTmp[1] = coordC->c->y;
 					coupsTmp[2] = commencePar;
-					coupsTmp[3] = courantDeplo->c->x1;
-					coupsTmp[4] = courantDeplo->c->y1;
+					coupsTmp[3] = courant->c->x1;
+					coupsTmp[4] = courant->c->y1;
 					coupsTmp[5] = '-';
-					coupsTmp[6] = courantDeplo->c->x2;
-					coupsTmp[7] = courantDeplo->c->y2;
+					coupsTmp[6] = courant->c->x2;
+					coupsTmp[7] = courant->c->y2;
 					coupsTmp[8] = '-';
-					coupsTmp[9] = courantDeplo->c->x;
-					coupsTmp[10] = courantDeplo->c->y;
+					coupsTmp[9] = courant->c->x;
+					coupsTmp[10] = courant->c->y;
 					coupsTmp[11] = 0;
 				}
 			}
@@ -1091,11 +1134,15 @@ char* minimaxIA(jeu *j, int profondeur){
 			removeLastH(j->coups);
 			jouerHistorique(j);
 			
-			courantDeplo = courantDeplo->next;
+			courant = courant->next;
 		}
+		freeListeC(deploPossibles);
 		
 		coordC = coordC->next;
 	}
+	freeNoeudC(courant);
+	free(coupsTmp);
+	freeListeC(coordCouleur);
 	return coups;
 }
 
