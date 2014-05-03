@@ -46,9 +46,6 @@ int main(int argc, char *argv[]){
 		}
 	}
 	
-	printf("B:%d N:%d\n", b, n);
-	printf("c: %s | t: %s\n", fichierCharger, fichierTest);
-	
 	j = initJeu(b, n);
 	if(fichierCharger != NULL) chargerFichierPlateau(j, fichierCharger);
 	if(fichierTest != NULL) chargerFichierTest(j, fichierTest);

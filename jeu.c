@@ -6,6 +6,9 @@
 #include <limits.h>
 #include "jeu.h"
 
+int HEURISTIQUE = 0;
+int AIDE_VALEUR = 0;
+
 /* Initialise le jeu */
 jeu *initJeu(int blanc, int noir){
 	jeu *j = malloc(sizeof(jeu));
@@ -39,6 +42,7 @@ void startJeu(jeu *j){
 	char *tmp;
 	int victoire = 0, coupsSucces = 0, tourSucces = 0;
 	while(sortie != 1 && victoire < 2){
+		printf("=========================================================\n");
 		printPlateau(j);
 		tourSucces = 0;
 		coupsSucces = 0;
@@ -72,7 +76,7 @@ void startJeu(jeu *j){
 				j->joueur = (j->joueur == 'b')? 'n' : 'b';
 				tourSucces = 1;
 			}else if(strlen(input) == 1 && input[0] == 'h'){
-				printf("v : heuristique du dernier coups\nc : historique des coups\nr : annuler dernier coups\ns : sauvegarder l'historique des coups\np : sauvegarder le plateau\nq : quitter\n");
+				printf("v : affichage de l'heuristique\na : affichage de la légende des pièces\nc : historique des coups\nr : annuler dernier coups\ns : sauvegarder l'historique des coups\np : sauvegarder le plateau\nq : quitter\n");
 			}else if(strlen(input) == 1 && input[0] == 's'){
 				printf("[ATTENTION] Sauvegarder un historique de coups d'une configuration de départ personnalisée ne pourra être rejoué que avec cette configuration\n");
 				printf("Nom du fichier de sauvegarde ? ");
@@ -89,7 +93,23 @@ void startJeu(jeu *j){
 				sauvegarderPlateau(j, nomSauvegarde);
 				printf("Sauvegarde terminée.\n");
 			}else if(strlen(input) == 1 && input[0] == 'v'){
-				printf("Heuristique courante : %d\n", evaluationPlateau(j, j->joueur));
+				if(HEURISTIQUE){
+					printf("Affichage de l'heuristique désactivé\n");
+					HEURISTIQUE = 0;
+				}else{
+					printf("Affichage de l'heuristique activé\n");
+					HEURISTIQUE = 1;
+				}
+				printPlateau(j);
+			}else if(strlen(input) == 1 && input[0] == 'a'){
+				if(AIDE_VALEUR){
+					printf("Affichage des valeurs des pièces désactivé\n");
+					AIDE_VALEUR = 0;
+				}else{
+					printf("Affichage des valeurs des pièces activé\n");
+					AIDE_VALEUR = 1;
+				}
+				printPlateau(j);
 			}else if(estMouvement(input, j->joueur)){
 				x = input[0];
 				y = input[1];
@@ -111,7 +131,7 @@ void startJeu(jeu *j){
 				a = input[6];
 				b = input[7];
 				commencePar = input[2];
-				printf("Déploiement de (%c,%c) en (%c,%c) commençant par les %s en (%c,%c)\n", x, y, a, b, (commencePar == '+')? "carrés" : "ronds", a1, b1);
+				printf("Déploiement de (%c,%c) en (%c,%c) commençant par les %s en (%c,%c) : ", x, y, a, b, (commencePar == '+')? "carrés" : "ronds", a1, b1);
 				if(estPieceDuJoueur(j->list, x, y, j->joueur) && deploValide(j->list, j->joueur, commencePar, x, y, a, b, a1, b1)){
 					tourSucces = deploPieceDouble(j->list, j->joueur, commencePar, x, y, a, b, a1, b1);
 					coupsSucces = 1;
@@ -129,7 +149,7 @@ void startJeu(jeu *j){
 				a = input[9];
 				b = input[10];
 				commencePar = input[2];
-				printf("Déploiement de (%c,%c) en (%c,%c) commençant par les %s en (%c,%c)(%c,%c)\n", x, y, a, b, (commencePar == '+')? "carrés" : "ronds", a1, b1, a2, b2);
+				printf("Déploiement de (%c,%c) en (%c,%c) commençant par les %s en (%c,%c)(%c,%c) : ", x, y, a, b, (commencePar == '+')? "carrés" : "ronds", a1, b1, a2, b2);
 				if(estPieceDuJoueur(j->list, x, y, j->joueur) && deploValide(j->list, j->joueur, commencePar, x, y, a, b, a1, b1)){
 					tourSucces = deploPieceTriple(j->list, j->joueur, commencePar, x, y, a, b, a1, b1, a2, b2);
 					coupsSucces = 1;
@@ -138,7 +158,8 @@ void startJeu(jeu *j){
 					printf("[impossible]\n");
 				}
 			}else{
-				printf("Mauvaises coordonnées !\n");
+				if(!(j->joueur == 'b' && j->blanc > 1) || (j->joueur == 'n' && j->noir > 1))
+					printf("Mauvaises coordonnées !\n");
 			}
 		}while(tourSucces == 0);
 		if(coupsSucces) addListeH(j->coups, input);
@@ -152,7 +173,6 @@ void startJeu(jeu *j){
 		j->coups->last->c[2] = '#';
 		j->coups->last->c[3] = '\0';
 	}
-	printListeH(j->coups);
 	printf("Fermeture du jeu\n");
 }
 
@@ -449,11 +469,12 @@ void printPlateau(jeu *j){
 				printf(" . ");
 		}
 		printf("|");
-		if(ligne == '7') printf("    1: c    2: r");
-		if(ligne == '6') printf("    3: cc   4: rr");
-		if(ligne == '5') printf("    5: ccc  6: rrr");
-		if(ligne == '4') printf("    7: cr   8: ccr");
-		if(ligne == '3') printf("    9: crr");
+		if(ligne == '7' && AIDE_VALEUR) printf("    1: c    2: r");
+		if(ligne == '6' && AIDE_VALEUR) printf("    3: cc   4: rr");
+		if(ligne == '5' && AIDE_VALEUR) printf("    5: ccc  6: rrr");
+		if(ligne == '4' && AIDE_VALEUR) printf("    7: cr   8: ccr");
+		if(ligne == '3' && AIDE_VALEUR) printf("    9: crr");
+		if(ligne  == '2' && HEURISTIQUE) printf("    Heuristique : %d", evaluationPlateau(j, j->joueur));
 		if(ligne == '1') printf("    h: liste des commandes");
 		printf("\n");
 	}

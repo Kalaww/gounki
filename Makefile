@@ -7,7 +7,7 @@ OBJ=$(SRC:.c=.o)
 
 all : $(EXEC)
 
-test : $(OBJ)
+gounki : $(OBJ)
 	$(CC) -o $@ $^ $(LDFLAGS)
 
 %.o : %.c
