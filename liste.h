@@ -63,6 +63,7 @@ int equalsCoords(coords*, coords*);
 coords *initCoordss(char, char, char, char, char, char);
 coords *initCoords(char, char, char, char);
 coords *initCoord(char, char);
+coords *initCoordP(char, char, char);
 
 listeH *initListeH();
 void freeListeH(listeH*);

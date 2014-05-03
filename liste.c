@@ -202,6 +202,20 @@ coords *initCoord(char x, char y){
 	return tmp;
 }
 
+/* Initialise une coordonnée triple ne contenant qu'une coordonnée et un valeur de pièce*/
+coords *initCoordP(char x, char y, char valeur){
+	coords *tmp = malloc(sizeof(coords));
+	tmp->x = x;
+	if(y > '9') tmp->y = '9';
+	else if(y < '0') tmp->y = '0';
+	else tmp->y = y;
+	tmp->x1 = valeur;
+	tmp->x2 = 0;
+	tmp->y1 = 0;
+	tmp->y2 = 0;
+	return tmp;
+}
+
 /* Test égalité de deux coordonnées triples */
 int equalsCoords(coords *a, coords *b){
 	return a->x == b->x && a->y == b->y && a->x1 == b->x1 && a->y1 == b->y1 && a->x2 == b->x2 && a->y2 == b->y2;
