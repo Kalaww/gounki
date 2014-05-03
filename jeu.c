@@ -149,7 +149,10 @@ void startJeu(jeu *j){
 		if(victoire == 2) printf("Victoire du joueur Blanc !\n");
 		else if(victoire == 3) printf("Victoire du joueur Noir !\n");
 		else printf("Le jeu s'est terminé sans victoire.\n");
+		j->coups->last->c[2] = '#';
+		j->coups->last->c[3] = '\0';
 	}
+	printListeH(j->coups);
 	printf("Fermeture du jeu\n");
 }
 
@@ -237,6 +240,7 @@ void jouerHistorique(jeu *j){
 	
 	courant = j->coups->first;
 	while(courant != NULL){
+		if(courant->c[2] == '#') return;
 		if(estMouvement(courant->c, j->joueur)){
 			if(estPieceDuJoueur(j->list, courant->c[0], courant->c[1], j->joueur) && deplaValide(j->list, j->joueur, courant->c[0], courant->c[1], courant->c[3], courant->c[4])){
 				deplaPiece(j->list, courant->c[0], courant->c[1], courant->c[3], courant->c[4]);
@@ -717,7 +721,7 @@ char* meilleurCoups(jeu *j){
 	return coups;
 }
 
-/* Minimax */
+/* Minimax pour les maximums*/
 int minimaxMax(jeu *j, int profondeur, int profondeurMax, char couleur, int alpha, int beta){
 	char *coups, commencePar, *coupsTmp;
 	int valeurMax = INT_MIN, tmp;
@@ -862,7 +866,7 @@ int minimaxMax(jeu *j, int profondeur, int profondeurMax, char couleur, int alph
 	return valeurMax;
 }
 
-/* Minimax */
+/* Minimax pour les minimums*/
 int minimaxMin(jeu *j, int profondeur, int profondeurMax, char couleur, int alpha, int beta){
 	char *coups, commencePar, *coupsTmp;
 	int valeurMax = INT_MAX, tmp;
@@ -1009,7 +1013,7 @@ int minimaxMin(jeu *j, int profondeur, int profondeurMax, char couleur, int alph
 	return valeurMax;
 }
 
-/* Minimax */
+/* Minimax de départ*/
 char* minimaxIA(jeu *j, int profondeur){
 	char *coups, commencePar, *coupsTmp;
 	int valeurMax = INT_MIN, tmp;
