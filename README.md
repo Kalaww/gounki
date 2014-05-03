@@ -16,6 +16,8 @@ Compilation avec le Makefile via la commande:
 
 - `-t [fichier]` : Joue une suite de coups contenu dans le fichier en paramètre. Peut être couplé avec `-c [fichier]`.
 
+- `-p [valeur]` : Changer la profondeur de l'algorithme minimax. Plus la valeur est importante, plus le temps de calcul sera long.
+
 ###FORMAT FICHIER
 
 ####LISTE DE COUPS
