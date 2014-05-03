@@ -40,9 +40,10 @@ codage suivant:
 ###OPTION EN JEU
 Plusieurs options sont disponibles pendant une partie :
 - h : affiche la liste des options.
+- v : active/désactive l'affichage de la valeur de l'heuristique du joueur courant.
+- a : active/désactive l'affichage de la légende des valeurs des pièces.
 - c : affiche l'historique des coups de la partie.
 - r : annule le dernier coup joué. Si un joueur humain joue contre une IA, celà annulera les deux derniers coups.
 - q : quitte le programme.
 - s : sauvegarde l'historique des coups de la partie dans un fichier.
 - p : sauvegarde de la configuration du plateau de jeu dans un fichier.
-- v : affiche la valeur de l'heuristique du joueur courant.
