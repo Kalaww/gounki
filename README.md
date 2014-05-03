@@ -1,5 +1,5 @@
 #GOUNKI
-github.com/cedeify/gounki
+_github.com/cedeify/gounki_
 
 ###COMPILATION
 Compilation avec le Makefile via la commande:
