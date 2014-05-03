@@ -1,6 +1,9 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "jeu.h"
+
+extern int MM_PROF;
 
 int main(int argc, char *argv[]){
 	jeu *j;
@@ -42,6 +45,16 @@ int main(int argc, char *argv[]){
 		if(strlen(argv[i]) == 2 && strcmp(argv[i], "-t") == 0){
 			if(i+1 >= argc || strlen(argv[i+1]) == 0 || argv[i+1][0] == '-') return 1;
 			fichierTest = argv[i+1];
+			i++;
+		}
+		
+		/* profondeur du minimax */
+		if(strlen(argv[i]) == 2 && strcmp(argv[i], "-p") == 0){
+			if(i+1 >= argc || strlen(argv[i+1]) == 0 || argv[i+1][0] == '-') return 1;
+			MM_PROF = atoi(argv[i+1]);
+			if(MM_PROF > 10){
+				printf("La profondeur du minimax est très grande. Le temps de calcul de l'IA risque d'être important.\n");
+			}
 			i++;
 		}
 	}

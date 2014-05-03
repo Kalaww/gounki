@@ -8,6 +8,7 @@
 
 int HEURISTIQUE = 0;
 int AIDE_VALEUR = 0;
+int MM_PROF = 4;
 
 /* Initialise le jeu */
 jeu *initJeu(int blanc, int noir){
@@ -487,7 +488,7 @@ char* jouerIA(jeu *j){
 	valeur = (j->joueur == 'b')? j->blanc : j->noir;
 	if(valeur == 2) return randomIA(j);
 	else if(valeur == 3) return meilleurCoups(j);
-	else if(valeur == 4) return minimaxIA(j, 4);
+	else if(valeur == 4) return minimaxIA(j, MM_PROF);
 	return NULL;
 }
 
