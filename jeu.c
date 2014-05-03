@@ -9,6 +9,9 @@
 int HEURISTIQUE = 0;
 int AIDE_VALEUR = 0;
 int MM_PROF = 4;
+int SAVE_END = 1;
+int SAVE_AUTO = 0;
+char* SAVE_AUTO_NAME;
 
 /* Initialise le jeu */
 jeu *initJeu(int blanc, int noir){
@@ -42,6 +45,10 @@ void startJeu(jeu *j){
 	char input[20];
 	char *tmp;
 	int victoire = 0, coupsSucces = 0, tourSucces = 0;
+	if(j->coups->length > 0 && j->coups->last->c[2] == '#'){
+		printPlateau(j);
+		victoire = (j->joueur == 'b')? 2 : 3;
+	}
 	while(sortie != 1 && victoire < 2){
 		printf("=========================================================\n");
 		printPlateau(j);
@@ -173,6 +180,24 @@ void startJeu(jeu *j){
 		else printf("Le jeu s'est terminé sans victoire.\n");
 		j->coups->last->c[2] = '#';
 		j->coups->last->c[3] = '\0';
+	}
+	
+	if(SAVE_AUTO){
+		sauvegarderHistorique(j, SAVE_AUTO_NAME);
+	}else if(SAVE_END){
+		printf("Souhaitez vous enregistrez l'historique de la partie ? (y,n) : ");
+		fgets(input, sizeof(input), stdin);
+		vide = strchr(input, '\n');
+		if(vide) *vide = 0;
+		if(strlen(input) == 1 && input[0] == 'y'){
+			printf("[ATTENTION] Sauvegarder un historique de coups d'une configuration de départ personnalisée ne pourra être rejoué que avec cette configuration\n");
+			printf("Nom du fichier de sauvegarde ? ");
+			fgets(nomSauvegarde, sizeof(nomSauvegarde), stdin);
+			vide = strchr(nomSauvegarde, '\n');
+			if(vide) *vide = 0;
+			sauvegarderHistorique(j, nomSauvegarde);
+			printf("Sauvegarde terminée.\n");
+		}
 	}
 	printf("Fermeture du jeu\n");
 }

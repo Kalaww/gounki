@@ -4,6 +4,9 @@
 #include "jeu.h"
 
 extern int MM_PROF;
+extern int SAVE_END;
+extern int SAVE_AUTO;
+extern char* SAVE_AUTO_NAME;
 
 int main(int argc, char *argv[]){
 	jeu *j;
@@ -24,7 +27,7 @@ int main(int argc, char *argv[]){
 		}
 		
 		/* joueur noir */
-		if(strlen(argv[i]) == 2 && strcmp(argv[i], "-n") == 0){
+		else if(strlen(argv[i]) == 2 && strcmp(argv[i], "-n") == 0){
 			if(i+1 >= argc || strlen(argv[i+1]) == 0 || argv[i+1][0] == '-') return 1;
 			if(strcmp(argv[i+1], "h") == 0) n = 1;
 			else if(strcmp(argv[i+1], "r1") == 0) n = 2;
@@ -35,26 +38,40 @@ int main(int argc, char *argv[]){
 		}
 		
 		/* fichier à charger */
-		if(strlen(argv[i]) == 2 && strcmp(argv[i], "-c") == 0){
+		else if(strlen(argv[i]) == 2 && strcmp(argv[i], "-c") == 0){
 			if(i+1 >= argc || strlen(argv[i+1]) == 0 || argv[i+1][0] == '-') return 1;
 			fichierCharger = argv[i+1];
 			i++;
 		}
 		
 		/* fichier à tester */
-		if(strlen(argv[i]) == 2 && strcmp(argv[i], "-t") == 0){
+		else if(strlen(argv[i]) == 2 && strcmp(argv[i], "-t") == 0){
 			if(i+1 >= argc || strlen(argv[i+1]) == 0 || argv[i+1][0] == '-') return 1;
 			fichierTest = argv[i+1];
 			i++;
 		}
 		
 		/* profondeur du minimax */
-		if(strlen(argv[i]) == 2 && strcmp(argv[i], "-p") == 0){
+		else if(strlen(argv[i]) == 2 && strcmp(argv[i], "-p") == 0){
 			if(i+1 >= argc || strlen(argv[i+1]) == 0 || argv[i+1][0] == '-') return 1;
 			MM_PROF = atoi(argv[i+1]);
 			if(MM_PROF > 10){
 				printf("La profondeur du minimax est très grande. Le temps de calcul de l'IA risque d'être important.\n");
 			}
+			i++;
+		}
+		
+		/* désactive la proposition de sauvegarde de fin de partie */
+		else if(strlen(argv[i]) == 2 && strcmp(argv[i], "-d") == 0){
+			SAVE_END = 0;
+		}
+		
+		/* fichier de sauvegarde automatique à la fin d'une partie */
+		else if(strlen(argv[i]) == 2 && strcmp(argv[i], "-s") == 0){
+			if(i+1 >= argc || strlen(argv[i+1]) == 0 || argv[i+1][0] == '-') return 1;
+			SAVE_AUTO_NAME = argv[i+1];
+			SAVE_END = 0;
+			SAVE_AUTO = 1;
 			i++;
 		}
 	}
