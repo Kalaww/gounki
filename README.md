@@ -38,7 +38,7 @@ codage suivant:
 - 9 : carré rond rond
 
 ###OPTION EN JEU
-Plusieurs options sont disponibles pendant une partie :
+Plusieurs options sont disponibles pendant une partie, il suffit de taper la lettre correspondante à la place de jouer un coup :
 - h : affiche la liste des options.
 - v : active/désactive l'affichage de la valeur de l'heuristique du joueur courant.
 - a : active/désactive l'affichage de la légende des valeurs des pièces.
