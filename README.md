@@ -25,13 +25,13 @@ Compilation avec le Makefile via la commande:
 ####CONFIGURATION DU PLATEAU
 Le format est composé d’une suite de 64 pièces séparées par un retour à la ligne (caractère '\n'). L’ordre des pièces est donné en parcourant le tableau ligne par ligne, par numéros et lettres croissants, c’est-à-dire qu’on donnera les cases dans cet ordre : a1, b1, c1, d1, e1, f1, g1, h1, a2, b2, etc. Les pièces sont représentées par un code à deux caractères. Le premier caractère peut-être B, N ou V, selon respectivement que la pièce est blanche ou noire ou que la case est vide. Le deuxième caractère est un chiffre codant le type de la pièce, suivant le
 codage suivant:
-0 : vide
-1 : carré
-2 : rond
-3 : carré double
-4 : rond double
-5 : carré triple
-6 : rond triple
-7 : carré rond
-8 : carré carré rond
-9 : carré rond rond
+-0 : vide
+-1 : carré
+-2 : rond
+-3 : carré double
+-4 : rond double
+-5 : carré triple
+-6 : rond triple
+-7 : carré rond
+-8 : carré carré rond
+-9 : carré rond rond
