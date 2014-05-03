@@ -1,5 +1,5 @@
 #GOUNKI
-_[GitHub](github.com/cedeify/gounki)_
+_Auteur : [GitHub](github.com/cedeify/gounki)_
 
 ###COMPILATION
 Compilation avec le Makefile via la commande:
@@ -36,3 +36,13 @@ codage suivant:
 - 7 : carré rond
 - 8 : carré carré rond
 - 9 : carré rond rond
+
+###OPTION EN JEU
+Plusieurs options sont disponibles pendant une partie :
+- h : affiche la liste des options.
+- c : affiche l'historique des coups de la partie.
+- r : annule le dernier coup joué. Si un joueur humain joue contre une IA, celà annulera les deux derniers coups.
+- q : quitte le programme.
+- s : sauvegarde l'historique des coups de la partie dans un fichier.
+- p : sauvegarde de la configuration du plateau de jeu dans un fichier.
+- v : affiche la valeur de l'heuristique du joueur courant.
