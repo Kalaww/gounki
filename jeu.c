@@ -711,7 +711,6 @@ char* meilleurCoups(jeu *j){
 				coupsTmp[4] = courantDepla->c->y;
 				coupsTmp[5] = 0;
 				tmp = evaluationPlateau(j, j->joueur);
-				printf("COUPS [%s] = %d\n", coupsTmp, tmp);
 				if(tmp > valeurMax){
 					valeurMax = tmp;
 					strcpy(coups, coupsTmp);
@@ -744,7 +743,6 @@ char* meilleurCoups(jeu *j){
 					coupsTmp[7] = courantDeplo->c->y;
 					coupsTmp[8] = 0;
 					tmp = evaluationPlateau(j, j->joueur);
-					printf("COUPS [%s] = %d\n", coupsTmp, tmp);
 					if(tmp > valeurMax){
 						valeurMax = tmp;
 						strcpy(coups, coupsTmp);
@@ -774,7 +772,6 @@ char* meilleurCoups(jeu *j){
 					coupsTmp[10] = courantDeplo->c->y;
 					coupsTmp[11] = 0;
 					tmp = evaluationPlateau(j, j->joueur);
-					printf("COUPS [%s] = %d\n", coupsTmp, tmp);
 					if(tmp > valeurMax){
 						valeurMax = tmp;
 						strcpy(coups, coupsTmp);
@@ -790,7 +787,6 @@ char* meilleurCoups(jeu *j){
 		
 		coordC = coordC->next;
 	}
-	printf("MEILLEUR COUP %d : %s\n", valeurMax, coups);
 	return coups;
 }
 
@@ -805,7 +801,7 @@ int minimaxMax(jeu *j, int profondeur, int profondeurMax, char couleur, int alph
 	noeudC *courant, *coordC;
 	
 	if(testVictoire(j->list, j->joueur)){
-		valeurMax = INT_MAX/profondeur;
+		valeurMax = INT_MIN/profondeur;
 		return valeurMax;
 	}else if(profondeur == profondeurMax){
 		return evaluationPlateau(j, couleur);
@@ -950,7 +946,7 @@ int minimaxMin(jeu *j, int profondeur, int profondeurMax, char couleur, int alph
 	noeudC *courant, *coordC;
 	
 	if(testVictoire(j->list, j->joueur)){
-		valeurMax = INT_MIN/profondeur;
+		valeurMax = INT_MAX/profondeur;
 		return valeurMax;
 	}else if(profondeur == profondeurMax){
 		return evaluationPlateau(j, couleur);
