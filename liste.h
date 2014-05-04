@@ -73,5 +73,6 @@ void addListeH(listeH*, char*);
 void removeListeH(listeH*, char*);
 void printListeH(listeH*);
 void removeLastH(listeH*);
+void removeFirstH(listeH*);
 
 #endif

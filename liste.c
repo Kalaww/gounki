@@ -298,6 +298,7 @@ void removeListeH(listeH *l, char *p){
 	}
 }
 
+/* Enlève le denrier coup de la liste */
 void removeLastH(listeH *l){
 	noeudH *courant, *tmp;
 	courant = l->first;
@@ -318,6 +319,15 @@ void removeLastH(listeH *l){
 			return;
 		}
 		courant = courant->next;
+	}
+}
+
+/* Enlève le premier coup de la liste */
+void removeFirstH(listeH *l){
+	noeudH * courant = l->first;
+	if(courant != NULL){
+		l->first = courant->next;
+		freeNoeudH(courant);
 	}
 }
 

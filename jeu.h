@@ -12,6 +12,7 @@ typedef struct jeu{
 	int blanc;
 	int noir;
 	listeH *coups;
+	listeH *recoups;
 } jeu;
 
 jeu *initJeu(int, int);

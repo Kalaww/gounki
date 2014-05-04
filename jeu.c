@@ -23,6 +23,7 @@ jeu *initJeu(int blanc, int noir){
 	j->noir = noir;
 	j->tour = 1;
 	j->coups = initListeH();
+	j->recoups = initListeH();
 	initPlateau(j->list);
 	initPlateau(j->starter);
 	return j;
@@ -42,9 +43,9 @@ void freeJeu(jeu *j){
 void startJeu(jeu *j){
 	char sortie = 0, x, y, a, b, a1, b1, a2, b2, commencePar, *vide;
 	char nomSauvegarde[100];
-	char input[20];
+	char input[20], tmpP[20];
 	char *tmp;
-	int victoire = 0, coupsSucces = 0, tourSucces = 0;
+	int victoire = 0, coupsSucces = 0, tourSucces = 0, rejouerOn = 0;
 	if(j->coups->length > 0 && j->coups->last->c[2] == '#'){
 		printPlateau(j);
 		victoire = (j->joueur == 'b')? 2 : 3;
@@ -54,6 +55,7 @@ void startJeu(jeu *j){
 		printPlateau(j);
 		tourSucces = 0;
 		coupsSucces = 0;
+		rejouerOn = 0;
 		do{
 			/* Tour IA */
 			if((j->joueur == 'b' && j->blanc > 1) || (j->joueur == 'n' && j->noir > 1)){
@@ -75,16 +77,36 @@ void startJeu(jeu *j){
 				printf("Historique des coups :\n");
 				printListeH(j->coups);
 			}else if(strlen(input) == 1 && input[0] == 'r'){
-				printf("Annulation du dernier coups joué\n");
-				if((j->joueur == 'n' && j->blanc > 1) || (j->joueur == 'b' && j->noir >1)){
+				if(j->coups->length == 0) printf("Aucun coups à annuler.\n");
+				else{
+					printf("Annulation du dernier coups joué.\n");
+					if((j->joueur == 'n' && j->blanc > 1) || (j->joueur == 'b' && j->noir >1)){
+						strcpy(tmpP, j->coups->last->c);
+						addListeH(j->recoups, tmpP);
+						removeLastH(j->coups);
+					}
+					strcpy(tmpP, j->coups->last->c);
+					addListeH(j->recoups, tmpP);
 					removeLastH(j->coups);
+					jouerHistorique(j);
+					j->joueur = (j->joueur == 'b')? 'n' : 'b';
+					tourSucces = 1;
+					rejouerOn = 1;
 				}
-				removeLastH(j->coups);
-				jouerHistorique(j);
-				j->joueur = (j->joueur == 'b')? 'n' : 'b';
-				tourSucces = 1;
+			}else if(strlen(input) == 1 && input[0] == 'b'){
+				if(j->recoups->length == 0) printf("Aucun coup à rejouer.\n");
+				else{
+					printf("Rejoue le dernier coups annulé.\n");
+					strcpy(tmpP, j->recoups->last->c);
+					removeLastH(j->recoups);
+					addListeH(j->coups, tmpP);
+					jouerHistorique(j);
+					j->joueur = (j->joueur == 'b')? 'n' : 'b';
+					tourSucces = 1;
+					if(j->recoups->length > 0) rejouerOn = 1;
+				}
 			}else if(strlen(input) == 1 && input[0] == 'h'){
-				printf("v : affichage de l'heuristique\na : affichage de la légende des pièces\nc : historique des coups\nr : annuler dernier coups\ns : sauvegarder l'historique des coups\np : sauvegarder le plateau\nq : quitter\n");
+				printf("v : affichage de l'heuristique\na : affichage de la légende des pièces\nc : historique des coup\nr : annuler dernier coups\nb : rejoue le dernier coup annulé\ns : sauvegarder l'historique des coups\np : sauvegarder le plateau\nq : quitter\n");
 			}else if(strlen(input) == 1 && input[0] == 's'){
 				printf("[ATTENTION] Sauvegarder un historique de coups d'une configuration de départ personnalisée ne pourra être rejoué que avec cette configuration\n");
 				printf("Nom du fichier de sauvegarde ? ");
@@ -173,6 +195,10 @@ void startJeu(jeu *j){
 		if(coupsSucces) addListeH(j->coups, input);
 		if(testVictoire(j->list, j->joueur)) victoire = (j->joueur == 'b')? 2 : 3;
 		j->joueur = (j->joueur == 'b')? 'n' : 'b';
+		if(!rejouerOn && j->recoups->length > 0){
+			freeListeH(j->recoups);
+			j->recoups = initListeH();
+		}
 	}
 	if(victoire > 1){
 		if(victoire == 2) printf("Victoire du joueur Blanc !\n");
@@ -260,7 +286,7 @@ int testVictoire(liste *l, char couleur){
 	int bool = 1;
 	courant = l->first;
 	while(courant != NULL){
-		if(courant->p->couleur == couleur && ((couleur == 'b' && courant->p->y == '9') || (couleur == 'n' && courant->p->y == '1'))) return 1;
+		if((courant->p->couleur == 'b' && courant->p->y == '9') || (courant->p->couleur == 'n' && courant->p->y == '0')) return 1;
 		if(courant->p->couleur != couleur) bool = 0;
 		courant = courant->next;
 	}
@@ -633,9 +659,9 @@ int evaluationPlateau(jeu *j, char couleur){
 		
 		/* Valeur avancée */
 		if(couleur == 'b')
-			valeur *= courant->p->y - '0'; 
+			tmp *= courant->p->y - '0'; 
 		else
-			valeur *= '9' - courant->p->y;
+			tmp *= '9' - courant->p->y;
 		
 		if(courant->p->couleur == couleur) valeur += tmp;
 		else valeur -= tmp;
@@ -779,7 +805,7 @@ int minimaxMax(jeu *j, int profondeur, int profondeurMax, char couleur, int alph
 	noeudC *courant, *coordC;
 	
 	if(testVictoire(j->list, j->joueur)){
-		valeurMax = INT_MAX/(profondeur +1);
+		valeurMax = INT_MAX/profondeur;
 		return valeurMax;
 	}else if(profondeur == profondeurMax){
 		return evaluationPlateau(j, couleur);
@@ -924,7 +950,7 @@ int minimaxMin(jeu *j, int profondeur, int profondeurMax, char couleur, int alph
 	noeudC *courant, *coordC;
 	
 	if(testVictoire(j->list, j->joueur)){
-		valeurMax = INT_MIN/(profondeur +1);
+		valeurMax = INT_MIN/profondeur;
 		return valeurMax;
 	}else if(profondeur == profondeurMax){
 		return evaluationPlateau(j, couleur);
