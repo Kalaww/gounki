@@ -55,6 +55,9 @@ int main(int argc, char *argv[]){
 		else if(strlen(argv[i]) == 2 && strcmp(argv[i], "-p") == 0){
 			if(i+1 >= argc || strlen(argv[i+1]) == 0 || argv[i+1][0] == '-') return 1;
 			MM_PROF = atoi(argv[i+1]);
+			if(MM_PROF == 0){
+				printf("Impossible de faire un IA minimax avec un profondeur de recherche de 0\n");
+			}
 			if(MM_PROF > 10){
 				printf("La profondeur du minimax est très grande. Le temps de calcul de l'IA risque d'être important.\n");
 			}

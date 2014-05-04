@@ -633,9 +633,9 @@ int evaluationPlateau(jeu *j, char couleur){
 		
 		/* Valeur avancée */
 		if(couleur == 'b')
-			valeur *= courant->p->y - '1'; 
+			valeur *= courant->p->y - '0'; 
 		else
-			valeur *= '8' - courant->p->y;
+			valeur *= '9' - courant->p->y;
 		
 		if(courant->p->couleur == couleur) valeur += tmp;
 		else valeur -= tmp;
