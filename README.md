@@ -50,6 +50,7 @@ Plusieurs options sont disponibles pendant une partie, il suffit de taper la let
 - a : active/désactive l'affichage de la légende des valeurs des pièces.
 - c : affiche l'historique des coups de la partie.
 - r : annule le dernier coup joué. Si un joueur humain joue contre une IA, celà annulera les deux derniers coups.
+- b : rejoue le dernier coup annulé.
 - q : quitte le programme.
 - s : sauvegarde l'historique des coups de la partie dans un fichier.
 - p : sauvegarde de la configuration du plateau de jeu dans un fichier.
