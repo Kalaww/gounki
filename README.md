@@ -18,6 +18,8 @@ Compilation avec le Makefile via la commande:
 
 - `-p [valeur]` : Changer la profondeur de l'algorithme minimax. Plus la valeur est importante, plus le temps de calcul sera long.
 
+- `-h [valeur]` : Changer la qualité de l'heuristique : valeur pouvant être 1 ou 2 (2 étant la meilleur). 
+
 - `-d` : Désactive la proposition de sauvegarde l'historique de coups à la fin d'une partie. Utile pour automatiser une série de parties. La proposition de sauvegarde est automatiquement désactivée avec l'utilisation de `-s [fichier]`.
 
 - `-s [fichier]` : Sauvegarde automatiquement à la fin d'une partie l'historique des coups dans le fichier en paramètre. Cette option désactive la proposition de sauvegarde de fin de partie.
