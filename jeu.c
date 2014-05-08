@@ -11,6 +11,7 @@ int AIDE_VALEUR = 0;
 int MM_PROF = 4;
 int SAVE_END = 1;
 int SAVE_AUTO = 0;
+int HEURISTIQUE_LVL = 1;
 char* SAVE_AUTO_NAME;
 
 /* Initialise le jeu */
@@ -622,8 +623,14 @@ char* randomIA(jeu *j){
 	return NULL;
 }
 
-/* Heuristique */
 int evaluationPlateau(jeu *j, char couleur){
+	if(HEURISTIQUE_LVL == 1) return evaluationPlateau1(j, couleur);
+	if(HEURISTIQUE_LVL == 2) return evaluationPlateau2(j, couleur);
+	return 0;
+}
+
+/* Heuristique 1 :  prise en compte de la valeur des pièces et de leur avancées */
+int evaluationPlateau1(jeu *j, char couleur){
 	int valeur = 10000, tmp;
 	noeud *courant;
 	
@@ -662,6 +669,74 @@ int evaluationPlateau(jeu *j, char couleur){
 			tmp *= courant->p->y - '0'; 
 		else
 			tmp *= '9' - courant->p->y;
+		
+		if(courant->p->couleur == couleur) valeur += tmp;
+		else valeur -= tmp;
+		
+		courant = courant->next;
+	}
+	return valeur;
+}
+
+/* Heuristique 2 : prise en compte des pièces qui entourent, valeurs des pièces différentes */
+int evaluationPlateau2(jeu *j, char couleur){
+	int valeur = 10000, tmp, avancer, autour, i, k;
+	noeud *courant;
+	piece *pieceTmp;
+	
+	courant = j->list->first;
+	while(courant != NULL){
+		tmp = 0;
+		avancer = 0;
+		autour = 0;
+		/* test victoire */
+		if((courant->p->couleur == 'b' && courant->p->y == '9') || (courant->p->couleur == 'n' && courant->p->y == '0')){
+			if(courant->p->couleur == couleur) valeur = INT_MAX;
+			else valeur = 0;
+			return valeur;
+		}
+		
+		/* valeur piece */
+		switch(courant->p->t){
+			case carre:
+			case rond:
+				tmp = 8; break;
+			case ccarre:
+			case rrond:
+			case crond:
+				tmp = 16; break;
+			case cccarre:
+			case rrrond:
+				tmp = 32; break;
+			case ccrond:
+			case crrond:
+				tmp = 64; break;
+			case vide:
+			default:
+				break;
+		}
+		
+		/* Valeur avancée */
+		if(couleur == 'b')
+			avancer = courant->p->y - '0'; 
+		else
+			avancer = '9' - courant->p->y;
+			
+		/* Valeur autour */
+		for(i = courant->p->x -1; i <= courant->p->x +1; i++){
+			for(k = courant->p->y -1; k <= courant->p->y +1; k++){
+				pieceTmp = getPieceByCoordListe(j->list, i, k);
+				if(pieceTmp != NULL){
+					if(courant->p->couleur == pieceTmp->couleur) autour++;
+					else{
+						if(courant->p->couleur == 'b' && k >= courant->p->y) autour--;
+						if(courant->p->couleur == 'n' && k <= courant->p->y) autour--;
+					}
+				}
+			}
+		}
+		
+		tmp = tmp*avancer + tmp*autour/8;
 		
 		if(courant->p->couleur == couleur) valeur += tmp;
 		else valeur -= tmp;

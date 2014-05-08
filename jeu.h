@@ -33,6 +33,8 @@ void sauvegarderPlateau(jeu*, char*);
 char* randomIA(jeu*);
 char* jouerIA(jeu*);
 int evaluationPlateau(jeu*, char);
+int evaluationPlateau1(jeu*, char);
+int evaluationPlateau2(jeu*, char);
 char* meilleurCoups(jeu*);
 int minimaxMax(jeu*, int, int, char, int, int);
 int minimaxMin(jeu*, int, int, char, int, int);

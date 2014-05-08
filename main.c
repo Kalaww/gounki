@@ -6,6 +6,7 @@
 extern int MM_PROF;
 extern int SAVE_END;
 extern int SAVE_AUTO;
+extern int HEURISTIQUE_LVL;
 extern char* SAVE_AUTO_NAME;
 
 int main(int argc, char *argv[]){
@@ -60,6 +61,19 @@ int main(int argc, char *argv[]){
 			}
 			if(MM_PROF > 10){
 				printf("La profondeur du minimax est très grande. Le temps de calcul de l'IA risque d'être important.\n");
+			}
+			i++;
+		}
+		
+		/* désactive la proposition de sauvegarde de fin de partie */
+		else if(strlen(argv[i]) == 2 && strcmp(argv[i], "-h") == 0){
+			if(i+1 >= argc || strlen(argv[i+1]) == 0 || argv[i+1][0] == '-') return 1;
+			fichierTest = argv[i+1];
+			if(strcmp(argv[i+1], "1") == 0) HEURISTIQUE_LVL = 1;
+			else if(strcmp(argv[i+1], "2") == 0) HEURISTIQUE_LVL = 2;
+			else{
+				printf("La valeur [%s] n'est pas une valeur valide pour -h\n", argv[i+1]);
+				exit(1);
 			}
 			i++;
 		}
