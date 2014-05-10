@@ -8,6 +8,7 @@ extern int SAVE_END;
 extern int SAVE_AUTO;
 extern int HEURISTIQUE_LVL;
 extern int HEURISTIQUE_ALEA;
+extern int HEURISTIQUE_ALEA_PERCENT;
 extern char* SAVE_AUTO_NAME;
 
 int main(int argc, char *argv[]){
@@ -59,6 +60,7 @@ int main(int argc, char *argv[]){
 			MM_PROF = atoi(argv[i+1]);
 			if(MM_PROF == 0){
 				printf("Impossible de faire un IA minimax avec un profondeur de recherche de 0\n");
+				exit(1);
 			}
 			if(MM_PROF > 10){
 				printf("La profondeur du minimax est très grande. Le temps de calcul de l'IA risque d'être important.\n");
@@ -66,9 +68,20 @@ int main(int argc, char *argv[]){
 			i++;
 		}
 		
-		/* désactive la proposition de sauvegarde de fin de partie */
+		/* active l'aléatoire pour l'IA minimax */
 		else if(strlen(argv[i]) == 2 && strcmp(argv[i], "-a") == 0){
 			HEURISTIQUE_ALEA = 1;
+		}
+		
+		/* change la valeur du pourcentage de différence par rapport au meilleur coup sur l'ia minimax avec aléatoire */
+		else if(strlen(argv[i]) == 2 && strcmp(argv[i], "-g") == 0){
+			if(i+1 >= argc || strlen(argv[i+1]) == 0 || argv[i+1][0] == '-') return 1;
+			HEURISTIQUE_ALEA_PERCENT = atoi(argv[i+1]);
+			if(HEURISTIQUE_ALEA_PERCENT < 1 || HEURISTIQUE_ALEA_PERCENT > 100){
+				printf("La valeur %d n'est pas une valeur autorisée : valeur entre 1 et 100\n", HEURISTIQUE_ALEA_PERCENT);
+				exit(1);
+			}
+			i++;
 		}
 		
 		/* désactive la proposition de sauvegarde de fin de partie */

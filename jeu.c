@@ -13,6 +13,7 @@ int MM_PROF = 4;
 int SAVE_END = 1;
 int SAVE_AUTO = 0;
 int HEURISTIQUE_LVL = 1;
+int HEURISTIQUE_ALEA_PERCENT = 90;
 char* SAVE_AUTO_NAME;
 
 /* Initialise le jeu */
@@ -1164,7 +1165,7 @@ char* minimaxIA(jeu *j, int profondeur){
 	if(HEURISTIQUE_ALEA){
 		coupCourant = listeCoups->first;
 		while(coupCourant != NULL){
-			if(coupCourant->valeur >= 0.9*valeurMax)
+			if(coupCourant->valeur >= HEURISTIQUE_ALEA_PERCENT*valeurMax/100)
 				addListeHbis(listeMeilleursCoups, coupCourant->c, coupCourant->valeur);
 			coupCourant = coupCourant->next;
 		}

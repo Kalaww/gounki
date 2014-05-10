@@ -24,6 +24,10 @@ Compilation avec le Makefile via la commande:
 
 - `-s [fichier]` : Sauvegarde automatiquement à la fin d'une partie l'historique des coups dans le fichier en paramètre. Cette option désactive la proposition de sauvegarde de fin de partie.
 
+- `-a` : Active l'aléatoire pour l'intelligence artificielle basée sur le minimax. Un coup sera choisi au hasard parmis la liste des meilleurs coups à jouer : 90% ou plus de la valeur du meilleur coup à jouer (le pourcentage peut être changé avec `-g [valeur]`.
+
+- `-g [valeur]` : Dans le cas d'une intelligence artificialle basée sur le minimax avec aléatoire (`-a`), la valeur donnée correspond au pourcentage de différence par rapport au meilleur coup à jouer pour qu'un coup fasse parti de la liste des meilleurs coups à jouer. La valeur dois être comprise entre 1 et 100.
+
 ###FORMAT FICHIER
 
 ####LISTE DE COUPS
