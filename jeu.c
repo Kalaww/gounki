@@ -7,6 +7,7 @@
 #include "jeu.h"
 
 int HEURISTIQUE = 0;
+int HEURISTIQUE_ALEA = 0;
 int AIDE_VALEUR = 0;
 int MM_PROF = 4;
 int SAVE_END = 1;
@@ -488,7 +489,7 @@ void sauvegarderPlateau(jeu *j, char *nomFichier){
 	fclose(file);
 }
 
-/* Initialise le plateau de jeu dans ca configuration classique */
+/* Initialise le plateau de jeu dans sa configuration classique */
 void initPlateau(liste *l){
 	char colonne;
 	int impair = carre, pair = rond;
@@ -1042,15 +1043,22 @@ int minimaxMin(jeu *j, int profondeur, int profondeurMax, char couleur, int alph
 /* Minimax de départ*/
 char* minimaxIA(jeu *j, int profondeur){
 	char *coups, commencePar, *coupsTmp;
-	int valeurMax = INT_MIN, tmp;
+	int valeurMax = INT_MIN, tmp, r;
 	listeC *coordCouleur;
 	listeC *deplaPossibles;
 	listeC *deploPossibles;
 	noeud *courantP;
 	noeudC *courant, *coordC;
+	listeH *listeCoups, *listeMeilleursCoups;
+	noeudH *coupCourant;
 	
 	coups = malloc(sizeof(char)*20);
 	coupsTmp = malloc(sizeof(char)*20);
+	
+	if(HEURISTIQUE_ALEA){
+		listeCoups = initListeH();
+		listeMeilleursCoups = initListeH();
+	}
 	
 	coordCouleur = initListeC();
 	courantP = j->list->first;
@@ -1083,6 +1091,8 @@ char* minimaxIA(jeu *j, int profondeur){
 				valeurMax = tmp;
 				strcpy(coups, coupsTmp);
 			}
+			
+			if(HEURISTIQUE_ALEA) addListeHbis(listeCoups, coupsTmp, tmp);
 			
 			removeLastH(j->coups);
 			jouerHistorique(j);
@@ -1139,6 +1149,8 @@ char* minimaxIA(jeu *j, int profondeur){
 				strcpy(coups, coupsTmp);
 			}
 			
+			if(HEURISTIQUE_ALEA) addListeHbis(listeCoups, coupsTmp, tmp);
+			
 			removeLastH(j->coups);
 			jouerHistorique(j);
 			
@@ -1148,6 +1160,24 @@ char* minimaxIA(jeu *j, int profondeur){
 		
 		coordC = coordC->next;
 	}
+	
+	if(HEURISTIQUE_ALEA){
+		coupCourant = listeCoups->first;
+		while(coupCourant != NULL){
+			if(coupCourant->valeur >= 0.9*valeurMax)
+				addListeHbis(listeMeilleursCoups, coupCourant->c, coupCourant->valeur);
+			coupCourant = coupCourant->next;
+		}
+		
+		srand(time(NULL));
+		r = rand() % listeMeilleursCoups->length;
+		coupCourant = listeMeilleursCoups->first;
+		for(; r > 0; r--) coupCourant = coupCourant->next;
+		strcpy(coups, coupCourant->c);
+	}
+	
+	freeListeH(listeCoups);
+	freeListeH(listeMeilleursCoups);
 	freeNoeudC(courant);
 	free(coupsTmp);
 	freeListeC(coordCouleur);

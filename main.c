@@ -7,6 +7,7 @@ extern int MM_PROF;
 extern int SAVE_END;
 extern int SAVE_AUTO;
 extern int HEURISTIQUE_LVL;
+extern int HEURISTIQUE_ALEA;
 extern char* SAVE_AUTO_NAME;
 
 int main(int argc, char *argv[]){
@@ -63,6 +64,11 @@ int main(int argc, char *argv[]){
 				printf("La profondeur du minimax est très grande. Le temps de calcul de l'IA risque d'être important.\n");
 			}
 			i++;
+		}
+		
+		/* désactive la proposition de sauvegarde de fin de partie */
+		else if(strlen(argv[i]) == 2 && strcmp(argv[i], "-a") == 0){
+			HEURISTIQUE_ALEA = 1;
 		}
 		
 		/* désactive la proposition de sauvegarde de fin de partie */

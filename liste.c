@@ -273,6 +273,18 @@ void addListeH(listeH *l, char *s){
 	l->length++;
 }
 
+/* Ajoute le coup et sa valeur (pour l'heuristique aléatoire) à la liste */
+void addListeHbis(listeH *l, char *s, int valeur){
+	noeudH *n = malloc(sizeof(noeudH));
+	strcpy(n->c, s);
+	n->next = NULL;
+	n->valeur = valeur;
+	if(l->first == NULL) l->first = n;
+	if(l->last) l->last->next = n;
+	l->last = n;
+	l->length++;
+}
+
 /* Enlève le coups de la liste */
 void removeListeH(listeH *l, char *p){
 	noeudH *courant, *tmp;
@@ -337,6 +349,17 @@ void printListeH(listeH *l){
 	courant = l->first;
 	while(courant != NULL){
 		printf("[%s]", courant->c);
+		courant = courant->next;
+	}
+	printf("\n");
+}
+
+/* Affiche la liste de coups avec leur valeur (pour l'heuristique aléatoire) */
+void printListeHbis(listeH *l){
+	noeudH* courant;
+	courant = l->first;
+	while(courant != NULL){
+		printf("[%s, %d]", courant->c, courant->valeur);
 		courant = courant->next;
 	}
 	printf("\n");

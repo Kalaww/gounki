@@ -39,6 +39,7 @@ typedef struct listeH{
 
 typedef struct noeudH{
 	char c[20];
+	int valeur;
 	struct noeudH *next;
 } noeudH;
 
@@ -70,8 +71,10 @@ void freeListeH(listeH*);
 void freeNoeudH(noeudH*);
 void freeNoeudRecursiveH(noeudH*);
 void addListeH(listeH*, char*);
+void addListeHbis(listeH*, char*, int);
 void removeListeH(listeH*, char*);
 void printListeH(listeH*);
+void printListeHbis(listeH*);
 void removeLastH(listeH*);
 void removeFirstH(listeH*);
 
