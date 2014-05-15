@@ -34,13 +34,13 @@ listeC* deplaCasesPossibles(liste *l, type t, char couleur, char x, char y){
 	listeC *cases = initListeC();
 	int sens = (couleur == 'b')? 1 : -1;
 	
-	if(t == carre || t == crond || t == crrond || t == ccarre || t == cccarre){
+	if(t == carre || t == crond || t == crrond || t == ccrond|| t == ccarre || t == cccarre){
 		if(x > 'a' && deplaPossibleSurCase(l, couleur, x-1, y)) addListeC(cases, initCoord(x-1, y));
 		if(x < 'h' && deplaPossibleSurCase(l, couleur, x+1, y)) addListeC(cases, initCoord(x+1, y));
 		if(deplaPossibleSurCase(l, couleur, x, y+sens)) addListeC(cases, initCoord(x, y+sens));
 	}
 	
-	if(t == rond || t == crond || t == ccrond || t == rrond || t == rrrond){
+	if(t == rond || t == crond || t == ccrond || t == crrond || t == rrond || t == rrrond){
 		if(x > 'a' && deplaPossibleSurCase(l, couleur, x-1, y+sens)) addListeC(cases, initCoord(x-1, y+sens));
 		if(x < 'h' && deplaPossibleSurCase(l, couleur, x+1, y+sens)) addListeC(cases, initCoord(x+1, y+sens));
 	}
