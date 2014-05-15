@@ -34,18 +34,18 @@ listeC* deplaCasesPossibles(liste *l, type t, char couleur, char x, char y){
 	listeC *cases = initListeC();
 	int sens = (couleur == 'b')? 1 : -1;
 	
-	if(t == carre || t == crond || t == crrond){
+	if(t == carre || t == crond || t == crrond || t == ccarre || t == cccarre){
 		if(x > 'a' && deplaPossibleSurCase(l, couleur, x-1, y)) addListeC(cases, initCoord(x-1, y));
 		if(x < 'h' && deplaPossibleSurCase(l, couleur, x+1, y)) addListeC(cases, initCoord(x+1, y));
 		if(deplaPossibleSurCase(l, couleur, x, y+sens)) addListeC(cases, initCoord(x, y+sens));
 	}
 	
-	if(t == rond || t == crond || t == ccrond){
+	if(t == rond || t == crond || t == ccrond || t == rrond || t == rrrond){
 		if(x > 'a' && deplaPossibleSurCase(l, couleur, x-1, y+sens)) addListeC(cases, initCoord(x-1, y+sens));
 		if(x < 'h' && deplaPossibleSurCase(l, couleur, x+1, y+sens)) addListeC(cases, initCoord(x+1, y+sens));
 	}
 	
-	if(t == ccarre || t == ccrond){
+	if(t == ccarre || t == ccrond || t == cccarre){
 		/*rebond*/
 		if(x == 'b'){
 			if(getPieceByCoordListe(l, x-1, y) == NULL) addListeC(cases, initCoord(x, y));
@@ -69,7 +69,7 @@ listeC* deplaCasesPossibles(liste *l, type t, char couleur, char x, char y){
 			addListeC(cases, initCoord(x, y+2*sens));
 	}
 	
-	if(t == rrond || t == crrond){
+	if(t == rrond || t == crrond || t == rrrond){
 		/*rebond*/
 		if(x == 'b'){
 			if(getPieceByCoordListe(l, x-1, y+sens) == NULL && deplaPossibleSurCase(l, couleur, x, y+2*sens))
